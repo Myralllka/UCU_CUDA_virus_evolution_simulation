@@ -1,3 +1,6 @@
+import random
+
+
 class Person:
     def __init__(self, state=0):
         """
@@ -11,48 +14,49 @@ class Person:
             - probability get ill
             - probability to die
         """
-        self.state = state
-        self.characters = ['.', '*', 'O', ' ']
-        self.probabilities = [1 / 3, 1 / 4, 1 / 20]
+        self._state = state
+        self._characters = ['.', '*', 'O', ' ']
+        self._probabilities = [1 / 3, 1 / 4, 1 / 20, 1]
+
+    def is_alive(self):
+        return self._state != 3
+
+    def is_patient(self):
+        return self._state == 2
+
+    def is_infected(self):
+        return self._state == 1
 
     def get_infected(self):
-        self.state = 1
+        self._state = 1
 
-    def become_ill(self):
-        self.state = 2
+    def become_patient(self):
+        self._state = 2
 
     def die(self):
-        self.state = 3
+        self._state = 3
 
     def recuperate(self):
-        self.state = 0
+        self._state = 0
+
+    @property
+    def probability_get_patient(self):
+        return self._probabilities[self._state] if self._state == 1 else 0
+
+    @property
+    def probability_to_die(self):
+        return self._probabilities[self._state] if self._state == 2 else 0
+
+    @property
+    def probability_get_infected(self):
+        return self._probabilities[self._state] if self._state == 0 else 0
 
     def __str__(self):
-        return self.characters[self.state]
-
-    def change_the_era(self):
-        pass
-
-
-class Cell:
-    def __init__(self, person):
-        self.person = person
-
-    def __str__(self):
-        return str(self.person)
-
-
-class ProbabilityMatrix:
-    def __init__(self):
-        pass
-
-    def apply(self, f):
-        pass
-
+        return self._characters[self._state]
 
 class Field:
     def __init__(self, x: int):
-        self.matrix = [[Cell(Person()) for i in range(x)] for j in range(x)]
+        self.matrix = [[Person() for i in range(x)] for j in range(x)]
 
     def show(self):
         res = "|"
@@ -62,10 +66,26 @@ class Field:
             res += '\n|'
         print(res[:-2])
 
+    def infect(self, x, y):
+        self.matrix[x][y] = Person(1)
+
     def change_the_era(self):
         pass
+
+    def make_probability_matrix(self):
+        res = [[0 for i in range(len(self.matrix))] for j in range(len(self.matrix[0]))]
+        for i in range(len(self.matrix)):
+            for j in range(len(self.matrix[i])):
+                if self.matrix[i][j].is_alive():
+                    if self.matrix[i][j].is_infected():
+                        pass
+
+
 
 
 if __name__ == "__main__":
     F = Field(10)
+    F.infect(2, 2)
+    F.show()
+    F.change_the_era()
     F.show()

@@ -27,32 +27,36 @@ class Person:
     def is_infected(self):
         return self._state == 1
 
-    def get_infected(self):
+    def is_healthy(self):
+        return self._state == 0
+
+    def become_infected(self):
         self._state = 1
 
     def become_patient(self):
         self._state = 2
 
-    def die(self):
+    def become_dead(self):
         self._state = 3
 
-    def recuperate(self):
+    def become_healthy(self):
         self._state = 0
 
     @property
-    def probability_get_patient(self):
+    def probability_become_patient(self):
         return self._probabilities[self._state] if self._state == 1 else 0
 
     @property
-    def probability_to_die(self):
+    def probability_become_dead(self):
         return self._probabilities[self._state] if self._state == 2 else 0
 
     @property
-    def probability_get_infected(self):
+    def probability_become_infected(self):
         return self._probabilities[self._state] if self._state == 0 else 0
 
     def __str__(self):
         return self._characters[self._state]
+
 
 class Field:
     def __init__(self, x: int):
@@ -65,27 +69,36 @@ class Field:
                 res += " " + str(j) + ' |'
             res += '\n|'
         print(res[:-2])
+        print("_" * len(self.matrix) * 4)
 
-    def infect(self, x, y):
-        self.matrix[x][y] = Person(1)
+    def infect(self, x, y, probability=None):
+        if self.person(x, y).is_healthy():
+            if probability:
+                self.person(x, y).become_infected()
 
     def change_the_era(self):
         pass
+
+    def person(self, x, y):
+        return self.matrix[x][y]
 
     def make_probability_matrix(self):
         res = [[0 for i in range(len(self.matrix))] for j in range(len(self.matrix[0]))]
         for i in range(len(self.matrix)):
             for j in range(len(self.matrix[i])):
-                if self.matrix[i][j].is_alive():
-                    if self.matrix[i][j].is_infected():
+                if self.person(i, j).is_alive():
+                    if self.person(i, j).is_infected():
+                        for a, b in [(i + 1, j), (i, j + 1), (i - 1, j), (i, j - 1)]:
+                            state = random.choices([0, 1], weights=[self.person(a, b).probability_become_infected,
+                                                                    1 - self.person(a, b).probability_become_infected])
+
+                    elif self.person(i, j).is_patient():
                         pass
-
-
 
 
 if __name__ == "__main__":
     F = Field(10)
-    F.infect(2, 2)
+    F.infect(2, 2, 1)
     F.show()
     F.change_the_era()
     F.show()

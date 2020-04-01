@@ -35,13 +35,15 @@ class Person:
 
     def become_infected(self):
         """
-        Become ifected only if you are in the normal state
+        Become infected only if you are in the normal state
         """
         if self._next_state == States.NORMAL:
             self._next_state = random.choices(
                 [self._next_state, States.INFECTED],
                 weights=[1 - self._next_state[States.INFECTED],
-                         self._next_state[States.INFECTED]])
+                         self._next_state[States.INFECTED]])[0]
+            if States.INFECTED == self._next_state:
+                self._static_state_timer = 1  # TODO: reduce hard-code value
 
     def become_patient(self):
         self._next_state = States.PATIENT
@@ -63,16 +65,18 @@ class Person:
     @property
     def probability_become_infected(self):
         return self._state[States.INFECTED]
-    
+
     def evolute(self):
         if self._state == States.INFECTED:
-            self._static_state_timer -= 1
+            if self._static_state_timer > 0:
+                self._static_state_timer -= 1
+            else:
+                self._next_state = States.PATIENT
         elif self._state == States.PATIENT:
             self._next_state = random.choices(
-                [self._next_state, States.INFECTED],
+                [States.NORMAL, States.DEAD],
                 weights=[1 - self._next_state[States.DEAD],
-                         self._next_state[States.DEAD]])
-
+                         self._next_state[States.DEAD]])[0]
         self._state = self._next_state
 
     def __str__(self):
@@ -93,8 +97,10 @@ class Field:
         print("_" * len(self.matrix) * 4)
 
     def infect(self, x, y):
-        self.person(x, y)._state = States.PATIENT
-        self.person(x, y)._next_state = States.PATIENT
+        self.person(x,
+                    y)._static_state_timer = 1  # TODO: reduce hard-code value
+        self.person(x, y)._state = States.INFECTED
+        self.person(x, y)._next_state = States.INFECTED
 
     def person(self, x: int, y: int):
         return self.matrix[x][y]
@@ -105,26 +111,29 @@ class Field:
                 yield x, y, self.matrix[x][y]
 
     def _infect_range(self, x, y):
-        for a, b in filter(lambda a, b: 0 < a < len(self.matrix) and 0 < b < len(self.matrix[a]), 
+        for a, b in filter(
+                lambda tuple2: 0 < tuple2[0] < len(self.matrix) and 0 < tuple2[1] < len(
+                    self.matrix[tuple2[0]]),
                 ((x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1))):
             yield a, b
 
     def change_the_era(self):
+        self.calculate_interactions()
         for _x, _y, tmp_person in self:
             tmp_person.evolute()
 
     def calculate_interactions(self):
         for x, y, tmp_person in self:
-            if tmp_person.is_alive() and (tmp_person.is_infected() or tmp_person.is_patient()):
+            if tmp_person.is_alive() and (
+                    tmp_person.is_infected() or tmp_person.is_patient()):
                 for a, b in self._infect_range(x, y):
                     self.person(a, b).become_infected()
-            
 
 
 if __name__ == "__main__":
-    F = Field(10)
-    F.infect(2, 2)
-    for i in range(3):
+    F = Field(15)
+    F.infect(4, 4)
+    for i in range(10):
         F.show()
         F.change_the_era()
     F.show()

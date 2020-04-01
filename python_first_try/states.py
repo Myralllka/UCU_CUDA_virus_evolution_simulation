@@ -38,9 +38,9 @@ class States:
 
 
 def init_states(states_class):
-    states_class.NORMAL.prob = defaultdict(float, {States.NORMAL: 1 / 3})
-    states_class.INFECTED.prob = defaultdict(float, {States.INFECTED: 1 / 3})
-    states_class.PATIENT.prob = defaultdict(float, {States.PATIENT: 1 / 3})
+    states_class.NORMAL.prob = defaultdict(float, {States.INFECTED: 1 / 3})
+    states_class.INFECTED.prob = defaultdict(float, {States.PATIENT: 1 / 3})
+    states_class.PATIENT.prob = defaultdict(float, {States.DEAD: 1 / 3})
     states_class.DEAD.prob = defaultdict(float, {})
 
 

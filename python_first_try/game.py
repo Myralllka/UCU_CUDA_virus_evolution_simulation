@@ -1,7 +1,9 @@
 #!/bin/env python3
 
-from states import States
 import random
+
+from constants import INCUBATION_TIME
+from states import States
 
 
 class Person:
@@ -43,7 +45,7 @@ class Person:
                 weights=[1 - self._next_state[States.INFECTED],
                          self._next_state[States.INFECTED]])[0]
             if States.INFECTED == self._next_state:
-                self._static_state_timer = 1  # TODO: reduce hard-code value
+                self._static_state_timer = INCUBATION_TIME
 
     def become_patient(self):
         self._next_state = States.PATIENT
@@ -98,7 +100,7 @@ class Field:
 
     def infect(self, x, y):
         self.person(x,
-                    y)._static_state_timer = 1  # TODO: reduce hard-code value
+                    y)._static_state_timer = INCUBATION_TIME
         self.person(x, y)._state = States.INFECTED
         self.person(x, y)._next_state = States.INFECTED
 
@@ -112,7 +114,8 @@ class Field:
 
     def _infect_range(self, x, y):
         for a, b in filter(
-                lambda tuple2: 0 < tuple2[0] < len(self.matrix) and 0 < tuple2[1] < len(
+                lambda tuple2: 0 < tuple2[0] < len(self.matrix) and 0 < tuple2[
+                    1] < len(
                     self.matrix[tuple2[0]]),
                 ((x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1))):
             yield a, b
@@ -133,7 +136,7 @@ class Field:
 if __name__ == "__main__":
     F = Field(15)
     F.infect(4, 4)
-    for i in range(25):
+    for i in range(10):
         F.show()
         F.change_the_era()
     F.show()

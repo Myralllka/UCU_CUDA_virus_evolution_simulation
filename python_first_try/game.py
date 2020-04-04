@@ -154,9 +154,9 @@ class Field:
 
 
 if __name__ == "__main__":
-    F = Field(10)
-    F.infect(1, 1)
-    for i in range(20):
+    F = Field(15)
+    F.infect(4, 4)
+    for i in range(10):
         F.show()
         F.change_the_era()
     F.show()

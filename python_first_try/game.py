@@ -3,7 +3,7 @@
 import random
 
 from constants import INCUBATION_TIME
-from states import States
+from states import States, Statistics
 
 
 class Person:
@@ -23,6 +23,9 @@ class Person:
         self._next_state = state
         self._static_state_timer = 0
 
+    def get_state(self):
+        return self._state
+
     def is_alive(self) -> bool:
         return self._state != States.DEAD
 
@@ -35,7 +38,7 @@ class Person:
     def is_healthy(self):
         return self._state == States.NORMAL
 
-    def become_infected(self):
+    def become_infected(self) -> bool:
         """
         Become infected only if you are in the normal state
         """
@@ -46,6 +49,8 @@ class Person:
                          self._next_state[States.INFECTED]])[0]
             if States.INFECTED == self._next_state:
                 self._static_state_timer = INCUBATION_TIME
+                return True
+        return False
 
     def become_patient(self):
         self._next_state = States.PATIENT
@@ -79,6 +84,7 @@ class Person:
                 [States.NORMAL, States.DEAD],
                 weights=[1 - self._next_state[States.DEAD],
                          self._next_state[States.DEAD]])[0]
+
         self._state = self._next_state
 
     def __str__(self):
@@ -114,9 +120,8 @@ class Field:
 
     def _infect_range(self, x, y):
         for a, b in filter(
-                lambda tuple2: 0 < tuple2[0] < len(self.matrix) and 0 < tuple2[
-                    1] < len(
-                    self.matrix[tuple2[0]]),
+                lambda tuple2: (0 <= tuple2[0] < len(self.matrix) and 0
+                                <= tuple2[1] < len(self.matrix[tuple2[0]])),
                 ((x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1))):
             yield a, b
 
@@ -132,11 +137,26 @@ class Field:
                 for a, b in self._infect_range(x, y):
                     self.person(a, b).become_infected()
 
+    def get_statistics(self) -> Statistics:
+        stats = Statistics()
+        for _x, _y, person in self:
+            if person.is_healthy():
+                stats.normal += 1
+            elif person.is_infected():
+                stats.infected += 1
+            elif person.is_patient():
+                stats.patient += 1
+            elif not person.is_alive():
+                stats.dead += 1
+            else:
+                raise ValueError("Error: Not register state!")
+        return stats
+
 
 if __name__ == "__main__":
-    F = Field(5)
+    F = Field(10)
     F.infect(1, 1)
-    for i in range(10):
+    for i in range(20):
         F.show()
         F.change_the_era()
     F.show()

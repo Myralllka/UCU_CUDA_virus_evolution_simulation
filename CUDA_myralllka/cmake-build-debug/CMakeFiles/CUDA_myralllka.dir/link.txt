@@ -1,1 +1,0 @@
-/opt/cuda/bin/g++  CMakeFiles/CUDA_myralllka.dir/first.cu.o -o CUDA_myralllka  -L"/opt/cuda/targets/x86_64-linux/lib/stubs" -L"/opt/cuda/targets/x86_64-linux/lib" -lcudadevrt -lcudart_static -lrt -lpthread -ldl

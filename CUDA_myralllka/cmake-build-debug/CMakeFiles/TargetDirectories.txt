@@ -1,3 +1,0 @@
-/home/myralllka/Documents/virus_evolution_simulation/CUDA_myralllka/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/myralllka/Documents/virus_evolution_simulation/CUDA_myralllka/cmake-build-debug/CMakeFiles/CUDA_myralllka.dir
-/home/myralllka/Documents/virus_evolution_simulation/CUDA_myralllka/cmake-build-debug/CMakeFiles/edit_cache.dir

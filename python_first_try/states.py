@@ -1,9 +1,6 @@
 from collections import defaultdict
 
 
-# from typing import DefaultDict
-
-
 class State:
     def __init__(self, new_id: int, new_repr: str,
                  prob: defaultdict = None):
@@ -37,10 +34,23 @@ class States:
     DEAD = State(3, ' ')
 
 
+class Statistics:
+    def __init__(self, ok=0, infected=0, ill=0, dead=0):
+        self.normal: int = ok
+        self.infected: int = infected
+        self.patient: int = ill
+        self.dead: int = dead
+
+    def total(self) -> int:
+        return self.dead + self.infected + self.patient + self.normal
+
+
 def init_states(states_class):
     states_class.NORMAL.prob = defaultdict(float, {States.INFECTED: 1 / 3})
-    states_class.INFECTED.prob = defaultdict(float, {States.PATIENT: 1 / 3})
-    states_class.PATIENT.prob = defaultdict(float, {States.DEAD: 1 / 3})
+    # static number of epoch's
+    states_class.INFECTED.prob = defaultdict(float, {States.PATIENT: 1})
+    states_class.PATIENT.prob = defaultdict(float, {States.DEAD: 1 / 3,
+                                                    States.NORMAL: 2 / 3})
     states_class.DEAD.prob = defaultdict(float, {})
 
 

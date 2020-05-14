@@ -28,7 +28,7 @@ mkdir -p ./cmake-build-debug;
 pushd ./cmake-build-debug  > /dev/null || exit 1
 
 
-if [ "$comp" = true -o ! -e count_number_of_all_words ]; then
+if [[ "$comp" = true || ! -e linear_cpp_sym ]]; then
   echo Compiling...
   cmake -DCMAKE_BUILD_TYPE=Release -G"Unix Makefiles" ..;
   make;

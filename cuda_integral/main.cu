@@ -19,8 +19,6 @@ inline static auto get_int_args_from_conf(const ConfigFileOpt &config) {
 }
 
 
-//__constant__ double m, c[5], a1[5], a2[5];
-//__constant__ langerman_coefs_t coefs;
 __constant__ double c[COEF_NUM], a1[COEF_NUM], a2[COEF_NUM];
 
 int main(int argc, char *argv[]) {
@@ -55,7 +53,7 @@ int main(int argc, char *argv[]) {
     gpuErrorCheck(cudaMemcpyToSymbol(a2, &config.get_a2()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice));
 
     auto before = get_current_time_fenced();
-    double cur_res = cuda_integrate(langermann_f, steps, int_args);
+    double cur_res = cuda_integrate(steps, int_args);
 
     double prev_res;
     bool to_continue = true;
@@ -70,7 +68,7 @@ int main(int argc, char *argv[]) {
 #endif
         prev_res = cur_res;
         steps *= 2;
-        cur_res = cuda_integrate(langermann_f, steps, int_args);
+        cur_res = cuda_integrate(steps, int_args);
         abs_err = fabs(cur_res - prev_res);
         rel_err = fabs((cur_res - prev_res) / cur_res);
 #ifdef PRINT_INTERMEDIATE_STEPS

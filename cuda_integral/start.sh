@@ -36,14 +36,14 @@ pushd ./cmake-build-debug  > /dev/null || exit 1
 if [[ "$comp" = true || ! -e cuda_integral ]];
 then
   echo Compiling...
-  cmake -DCMAKE_BUILD_TYPE=Release -G"Unix Makefiles" ..;
-  make;
+  cmake -DCMAKE_BUILD_TYPE=Release -G"Unix Makefiles" .. || exit 2;
+  make || exit 3;
 fi;
 
 if [[ "$make" = true ]];
 then
   echo Compiling...
-  make;
+  make || exit 11;
 fi;
 
 popd > /dev/null

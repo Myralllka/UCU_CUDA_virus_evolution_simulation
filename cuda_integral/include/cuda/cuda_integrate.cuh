@@ -14,13 +14,10 @@
 #define MAX_THREAD_NUM 256
 
 
-
 // steps describe the number of steps for etch x and y separately
 __global__ void cuda_thread_integrate(const double start_x, const double end_x,
-                                      double start_y, double end_y, double dxy, size_t steps, double *res) {
-    // TODO: consider duplications!!!
-    extern double *d_c, *d_a1, *d_a2;
-
+                                      double start_y, double end_y, double dxy, size_t steps, double *res,
+                                      const double *d_c, const double *d_a1, const double *d_a2) {
     __shared__ double local_res[MAX_THREAD_NUM], tmp_res[MAX_THREAD_NUM], tmp_diag[MAX_THREAD_NUM]; // local result
     double x;
     start_y = start_y + dxy * steps * threadIdx.x;
@@ -51,20 +48,36 @@ double cuda_integrate(size_t steps, const integration_args &int_ars) {
 //  dxy - the length of the side of one integration square
     double dxy = sqrt((int_ars.end.x - int_ars.start.x) * (int_ars.end.y - int_ars.start.y) / steps);
     size_t steps_per_thread = (int_ars.end.y - int_ars.start.y) / (dxy * int_ars.flow_n) + 1;
+
     double *d_res; //! Device
-    gpuErrorCheck(cudaMalloc((void **) &d_res, int_ars.flow_n * sizeof(double)));
+    double *d_c, *d_a1, *d_a2; // device pointers to constants
+
+    gpuErrorCheck(cudaMalloc((void **) &d_res, int_ars.flow_n * sizeof(double)))//
+
+    gpuErrorCheck(cudaMalloc(&d_c, sizeof(double) * COEF_NUM))//
+    gpuErrorCheck(cudaMalloc(&d_a1, sizeof(double) * COEF_NUM))//
+    gpuErrorCheck(cudaMalloc(&d_a2, sizeof(double) * COEF_NUM))//
+
+    gpuErrorCheck(cudaMemcpy(d_c, &int_ars.conf.c[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice)) //
+    gpuErrorCheck(cudaMemcpy(d_a1, &int_ars.conf.a1[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice)) //
+    gpuErrorCheck(cudaMemcpy(d_a2, &int_ars.conf.a2[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice)) //
 
     cuda_thread_integrate<<<1, int_ars.flow_n>>>(int_ars.start.x, int_ars.end.x,
-                                                 int_ars.start.y, int_ars.end.y, dxy, steps_per_thread, d_res);
+                                                 int_ars.start.y, int_ars.end.y, dxy, steps_per_thread, d_res,
+                                                 d_c, d_a1, d_a2);
 
     /////////////////////////////////// Finalize result ///////////////////////////////////
     double h_res[int_ars.flow_n]; // output buffer
     gpuErrorCheck(cudaMemcpy(h_res, d_res, int_ars.flow_n * sizeof(double), cudaMemcpyDeviceToHost));
-    for (ptrdiff_t i = 0; i < int_ars.flow_n; ++i) {
+    for (ptrdiff_t i = 0; i < int_ars.flow_n; ++i)
         res += h_res[i];
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////
 
-    gpuErrorCheck(cudaFree(d_res));
+    gpuErrorCheck(cudaFree(d_c))//
+    gpuErrorCheck(cudaFree(d_a1))//
+    gpuErrorCheck(cudaFree(d_a2))//
+
+    gpuErrorCheck(cudaFree(d_res))//
     return res;
 }
 

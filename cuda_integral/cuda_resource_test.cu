@@ -12,14 +12,14 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
 }
 
 int main(int argc, char *argv[]) {
-    int deviceCount = 0;
-    gpuErrorCheck(cudaGetDeviceCount(&deviceCount));
-    int dev, driverVersion = 0, runtimeVersion = 0;
-    for (dev = 0; dev < deviceCount; ++dev) {
-        gpuErrorCheck(cudaSetDevice(dev));
-        cudaDeviceProp deviceProp;
-        gpuErrorCheck(cudaGetDeviceProperties(&deviceProp, dev));
-        std::cout << "Name: "<< deviceProp.name << std::endl;
+//    int deviceCount = 0;
+//    gpuErrorCheck(cudaGetDeviceCount(&deviceCount));
+//    int dev, driverVersion = 0, runtimeVersion = 0;
+//    for (dev = 0; dev < deviceCount; ++dev) {
+//        gpuErrorCheck(cudaSetDevice(dev));
+//        cudaDeviceProp deviceProp;
+//        gpuErrorCheck(cudaGetDeviceProperties(&deviceProp, dev));
+//        std::cout << "Name: "<< deviceProp.name << std::endl;
 //        gpuErrorCheck(cudaDriverGetVersion(&driverVersion));
 //        gpuErrorCheck(cudaRuntimeGetVersion(&runtimeVersion));
 // deviceProp.name; deviceProp.totalGlobalMem;
@@ -42,8 +42,8 @@ int main(int argc, char *argv[]) {
 // deviceProp.maxThreadsPerBlock
 // deviceProp.maxThreadsDim[0/1/2]
 // deviceProp.maxGridSize[0/1/2]
-    }
-    std::cout << "Time = " << std::endl;
+
+//    std::cout << "Time = " << std::endl;
 
     return 0;
 }

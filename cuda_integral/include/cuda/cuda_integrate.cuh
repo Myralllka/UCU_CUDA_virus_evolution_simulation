@@ -9,7 +9,6 @@
 
 #include "../math/integration_args.h"
 #include "cuda_assert.cuh"
-#include <cmath>
 
 #define COEF_NUM 5
 #define MAX_THREAD_NUM 256
@@ -33,8 +32,7 @@ __global__ void cuda_thread_integrate(const double start_x, const double end_x,
             tmp_res[threadIdx.x] = 0.0;
             for (unsigned long int i = 0; i < COEF_NUM; ++i) {
                 tmp_diag[threadIdx.x] = (x - a1[i]) * (x - a1[i]) + (start_y - a2[i]) * (start_y - a2[i]);
-                tmp_res[threadIdx.x] +=
-                        c[i] * exp(-1 / M_PI * tmp_diag[threadIdx.x]) * cos(M_PI * tmp_diag[threadIdx.x]);
+                tmp_res[threadIdx.x] += c[i] * exp(-1 / M_PI * tmp_diag[threadIdx.x]) * cos(M_PI * tmp_diag[threadIdx.x]);
             }
             ///////////////////////////////////////////////////////////////////////////////
             local_res[threadIdx.x] -= tmp_res[threadIdx.x];

@@ -6,6 +6,10 @@ while true; do
       comp=true;
       shift
       ;;
+    -m|--make)
+      make=true;
+      shift
+      ;;
     -h|--help)
       echo "Usage: ./start.sh [options]
   Options:
@@ -36,5 +40,11 @@ then
   make;
 fi;
 
+if [[ "$make" = true ]];
+then
+  echo Compiling...
+  make;
+fi;
+
 popd > /dev/null
-optirun cmake-build-debug/cuda_integral
+optirun cmake-build-debug/cuda_integral execution.conf

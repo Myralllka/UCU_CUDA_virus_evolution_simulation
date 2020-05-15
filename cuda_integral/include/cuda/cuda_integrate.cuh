@@ -9,17 +9,17 @@
 
 #include "../math/integration_args.h"
 #include "cuda_assert.cuh"
-#include <cmath>
 
 #define COEF_NUM 5
 #define MAX_THREAD_NUM 256
 
-// TODO: consider duplications!!!
-extern __constant__ double c[COEF_NUM], a1[COEF_NUM], a2[COEF_NUM];
+
 
 // steps describe the number of steps for etch x and y separately
 __global__ void cuda_thread_integrate(const double start_x, const double end_x,
                                       double start_y, double end_y, double dxy, size_t steps, double *res) {
+    // TODO: consider duplications!!!
+    extern double *d_c, *d_a1, *d_a2;
 
     __shared__ double local_res[MAX_THREAD_NUM], tmp_res[MAX_THREAD_NUM], tmp_diag[MAX_THREAD_NUM]; // local result
     double x;
@@ -32,9 +32,9 @@ __global__ void cuda_thread_integrate(const double start_x, const double end_x,
             ////////////////////////// Langerman Function inline //////////////////////////
             tmp_res[threadIdx.x] = 0.0;
             for (unsigned long int i = 0; i < COEF_NUM; ++i) {
-                tmp_diag[threadIdx.x] = (x - a1[i]) * (x - a1[i]) + (start_y - a2[i]) * (start_y - a2[i]);
+                tmp_diag[threadIdx.x] = (x - d_a1[i]) * (x - d_a1[i]) + (start_y - d_a2[i]) * (start_y - d_a2[i]);
                 tmp_res[threadIdx.x] +=
-                        c[i] * exp(-1 / M_PI * tmp_diag[threadIdx.x]) * cos(M_PI * tmp_diag[threadIdx.x]);
+                        d_c[i] * exp(-1 / M_PI * tmp_diag[threadIdx.x]) * cos(M_PI * tmp_diag[threadIdx.x]);
             }
             ///////////////////////////////////////////////////////////////////////////////
             local_res[threadIdx.x] -= tmp_res[threadIdx.x];

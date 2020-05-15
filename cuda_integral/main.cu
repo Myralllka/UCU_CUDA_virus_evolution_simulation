@@ -19,7 +19,7 @@ inline static auto get_int_args_from_conf(const ConfigFileOpt &config) {
 }
 
 
-__constant__ double c[COEF_NUM], a1[COEF_NUM], a2[COEF_NUM];
+double *d_c, *d_a1, *d_a2;
 
 int main(int argc, char *argv[]) {
 //  //////////////////////////// Program Parameter Parsing ////////////////////////////
@@ -48,9 +48,13 @@ int main(int argc, char *argv[]) {
     size_t steps = config.get_init_steps();
     const integration_args int_args = get_int_args_from_conf(config);
 
-    gpuErrorCheck(cudaMemcpyToSymbol(c, &config.get_c()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice));
-    gpuErrorCheck(cudaMemcpyToSymbol(a1, &config.get_a1()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice));
-    gpuErrorCheck(cudaMemcpyToSymbol(a2, &config.get_a2()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice));
+    gpuErrorCheck(cudaMalloc(&d_c,sizeof(double) * COEF_NUM))
+    gpuErrorCheck(cudaMalloc(&d_a1,sizeof(double) * COEF_NUM))
+    gpuErrorCheck(cudaMalloc(&d_a2,sizeof(double) * COEF_NUM))
+
+    gpuErrorCheck(cudaMemcpy(d_c, &config.get_c()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice));
+    gpuErrorCheck(cudaMemcpy(d_a1, &config.get_a1()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice));
+    gpuErrorCheck(cudaMemcpy(d_a2, &config.get_a2()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice));
 
     auto before = get_current_time_fenced();
     double cur_res = cuda_integrate(steps, int_args);
@@ -90,5 +94,8 @@ int main(int argc, char *argv[]) {
     std::cout << "Relative_error = " << rel_err << std::endl;
     std::cout << "Time = " << to_us(time_to_calculate) << std::endl;
 
+    gpuErrorCheck(cudaFree(d_c))
+    gpuErrorCheck(cudaFree(d_a1))
+    gpuErrorCheck(cudaFree(d_a2))
     return 0;
 }

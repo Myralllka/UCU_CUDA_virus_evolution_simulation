@@ -42,11 +42,10 @@ class Person:
         """
         Become infected only if you are in the normal state
         """
+        
         if self._next_state == States.NORMAL:
             self._next_state = random.choices(
-                [self._next_state, States.INFECTED],
-                weights=[1 - self._next_state[States.INFECTED],
-                         self._next_state[States.INFECTED]])[0]
+                [self._next_state, States.INFECTED], weights=[1 - self._next_state[States.INFECTED], self._next_state[States.INFECTED]])[0]
             if States.INFECTED == self._next_state:
                 self._static_state_timer = INCUBATION_TIME
                 return True
@@ -156,7 +155,7 @@ class Field:
 if __name__ == "__main__":
     F = Field(15)
     F.infect(4, 4)
-    for i in range(10):
+    for i in range(20):
         F.show()
         F.change_the_era()
     F.show()

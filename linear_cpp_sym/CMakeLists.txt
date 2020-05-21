@@ -18,7 +18,7 @@ endif ()
 #INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
 file(GLOB_RECURSE SRC "includes/*.h" "src/*.cpp")
-add_executable(linear_cpp_sym main.cpp ${SRC})
+add_executable(linear_cpp_sym main.cpp ${SRC} includes/person.h includes/state_functions.cpp includes/state_functions.h includes/field.h includes/constants.h includes/statistics.h)
 #TARGET_LINK_LIBRARIES(linear_cpp_sym LINK_PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 #TARGET_LINK_LIBRARIES(linear_cpp_sym LINK_PUBLIC ${Boost_LIBRARIES})
 

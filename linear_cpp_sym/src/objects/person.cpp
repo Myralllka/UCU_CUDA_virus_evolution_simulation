@@ -11,7 +11,7 @@ void Person::set_timer(uint8_t t) {
 }
 
 State &Person::get_state() const {
-    return state;
+    return state.get();
 }
 
 bool Person::is_alive() const {
@@ -30,15 +30,12 @@ bool Person::is_healthy() const {
     return state.get() == States::normal;
 }
 
-bool Person::try_infect() {
-    if (next_state.get() == States::normal) {
-        next_state = random_state_choice(States::infected.prob, next_state, States::infected);
-        if (States::infected == next_state) {
-            state_timer = INCUBATION_TIME;
-            return true;
-        }
-    }
-    return false;
+bool Person::is_transmissible() const {
+    return state.get().mask_check(STATE_INFECT);
+};
+
+bool Person::has_immunity() const {
+    return state.get().mask_check(STATE_IMMUNITY);
 }
 
 void Person::become_healthy() {
@@ -61,14 +58,32 @@ char Person::get_repr() const {
     return static_cast<char>(state.get());
 }
 
-void Person::evolute() {
+bool Person::try_infect() {
+    if (next_state.get() == States::normal) {
+        next_state = random_state_choice(next_state.get().prob, next_state, States::infected);
+        if (States::infected == next_state) {
+            state_timer = States::incubation_time;
+            return true;
+        }
+    }
+    return false;
+}
+
+void Person::evolute(size_t *isolation_places) {
     if (state.get() == States::infected) {
-        if (state_timer > 0) {
+        if (state_timer > 0)
             state_timer -= 1;
-        } else
+        else
             next_state = States::patient;
     } else if (state.get() == States::patient) {
-        next_state = random_state_choice(States::dead.prob, States::normal, States::dead);
+        if (random_bool(States::crit_prob)) {
+            if (!is_transmissible()) (*isolation_places)++;
+            next_state = random_state_choice(state.get().prob, States::immunity, States::dead);
+        } else if (*isolation_places && is_transmissible()) {
+            std::cout << "test" << std::endl;
+            *isolation_places -= 1;
+            next_state = States::isolated;
+        }
     }
     state = next_state;
 }

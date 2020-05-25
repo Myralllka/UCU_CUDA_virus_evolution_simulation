@@ -5,18 +5,20 @@
 #ifndef LINEAR_CPP_SYM_STATE_FUNCTIONS_H
 #define LINEAR_CPP_SYM_STATE_FUNCTIONS_H
 
-#include "objects/state_obj.h"
-#include <ctime>
 #include <random>
+#include <ctime>
+#include <iostream>
+#include "objects/state_obj.h"
 
-//State create_state(int state_id);
-
-//void set_struct(States &cur_struct);
 
 // TODO: need upgrade (set seed in main)
+// TODO: use advanced random instead of c-random
 inline State &random_state_choice(float worst_weight, State &better_state, State &worst_state) {
-    srand(static_cast<unsigned>(time(NULL)));
     return (rand() / static_cast<float>(RAND_MAX) <= worst_weight) ? worst_state : better_state;
+}
+
+inline bool random_bool(float prob) {
+    return rand() / static_cast<float>(RAND_MAX) <= prob;
 }
 
 #endif //LINEAR_CPP_SYM_STATE_FUNCTIONS_H

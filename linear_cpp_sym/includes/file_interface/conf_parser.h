@@ -12,26 +12,17 @@ public:
 
     void parse(const std::string &file_name);
 
-    // make getters
-
-    std::string get_infile() const { return input_file; }
-
-    std::string get_out_by_a() const { return out_by_a; }
-
-    std::string get_out_by_n() const { return out_by_n; }
-
-    size_t get_number_of_threads() const { return threads; }
+    // declare all parameters
+    uint8_t incub_time = 0;
+    size_t isol_place = 0, field_size = 0, num_of_eras = 0;
+    float crit_prob = .0f;
+    float norm_to_inf = .0f, inf_to_pat = .0f, pat_to_dead = .0f, dead_to_norm = .0f;
+    //    size_t threads = 0;
 
 private:
     void init_opt_description();
 
     static std::string assert_file_exist(const std::string &f_name);
-
-    // declare all parameters
-    std::string input_file;
-    std::string out_by_a;
-    std::string out_by_n;
-    size_t threads = 0;
 
     boost::program_options::options_description opt_conf{"Config File Options"};
     boost::program_options::variables_map var_map{};

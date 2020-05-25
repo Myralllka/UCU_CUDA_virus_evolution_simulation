@@ -29,14 +29,14 @@ Person &Field::get_person(const Field::point &p) {
 void Field::execute_interactions() {
     for (size_t x = 0; x < matrix.size(); ++x)
         for (size_t y = 0; y < matrix[x].size(); ++y) {
-            auto temp_person = matrix[x][y];
+            const auto &temp_person = matrix[x][y];
             if (temp_person.is_alive() && (temp_person.is_infected() || temp_person.is_patient()))
                 for (const auto &pos : infect_range(x, y))
                     get_person(pos).try_infect();
         }
 }
 
-Field::Field(size_t f_size) {
+Field::Field(size_t f_size, size_t isolation_places) : isolation_places(isolation_places) {
     for (size_t i = 0; i < f_size; ++i) {
         std::vector<Person> new_vector(f_size);
         for (size_t j = 0; j < f_size; ++j) {
@@ -58,7 +58,7 @@ void Field::show() const {
 }
 
 void Field::infect(size_t x, size_t y) {
-    get_person(point{x, y}).set_timer(incubation_time);
+    get_person(point{x, y}).set_timer(States::incubation_time);
     get_person(point{x, y}).become_infected();
 }
 
@@ -66,5 +66,5 @@ void Field::change_the_era() {
     execute_interactions();
     for (auto &row : matrix)
         for (auto &person : row)
-            person.evolute();
+            person.evolute(&isolation_places);
 }

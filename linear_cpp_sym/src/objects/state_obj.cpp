@@ -7,9 +7,13 @@
 State State::NoneState = State{};
 
 State States::normal = State{};
+State States::immunity = State{};
 State States::infected = State{};
 State States::patient = State{};
+State States::isolated = State{};
 State States::dead = State{};
+float States::crit_prob = 0.0f;
+uint8_t States::incubation_time = 1;
 
 State &State::operator()(int new_id, char new_repr, float new_prob, State &new_next) {
     id = new_id;
@@ -20,13 +24,17 @@ State &State::operator()(int new_id, char new_repr, float new_prob, State &new_n
 }
 
 bool State::operator==(const State &other) const {
-    return id == other.id;
+    return (id & PURE_ID_MASK) == (other.id & PURE_ID_MASK);
 }
 
 bool State::operator!=(const State &other) const {
-    return id != other.id;
+    return (id & PURE_ID_MASK) != (other.id & PURE_ID_MASK);
 }
 
 State::operator char() const {
     return repr;
+}
+
+bool State::mask_check(uint8_t mask) const {
+    return id & mask;
 }

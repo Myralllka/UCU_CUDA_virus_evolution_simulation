@@ -5,7 +5,6 @@
 #include <iostream>
 #include "state_obj.h"
 #include "../state_functions.h"
-#include "../constants.h"
 
 
 class Person {
@@ -31,6 +30,10 @@ public:
 
     [[nodiscard]] bool is_healthy() const;
 
+    [[nodiscard]] bool is_transmissible() const;
+
+    [[nodiscard]] bool has_immunity() const;
+
     bool try_infect();
 
     void become_healthy();
@@ -43,17 +46,5 @@ public:
 
     char get_repr() const;
 
-//    @property
-//    def probability_become_patient(self):
-//        return self._state[States.PATIENT]
-//
-//    @property
-//    def probability_become_dead(self):
-//        return self._state[States.DEAD]
-//
-//    @property
-//    def probability_become_infected(self):
-//        return self._state[States.INFECTED]
-
-    void evolute();
+    void evolute(size_t *isolation_places);
 };

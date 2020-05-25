@@ -7,14 +7,13 @@
 
 #include <vector>
 #include "person.h"
-#include "../constants.h"
 #include <cinttypes>
 
 
 class Field {
-private:
-    const uint8_t incubation_time = INCUBATION_TIME;
+    size_t isolation_places;
     std::vector<std::vector<Person>> matrix{};
+    Statistics stats{};
 
     struct point {
         size_t x, y;
@@ -27,16 +26,11 @@ private:
     void execute_interactions();
 
 public:
-    explicit Field(size_t f_size);
+    explicit Field(size_t f_size, size_t isolation_places);
 
     void show() const;
 
     void infect(size_t x, size_t y);
-
-//        def __iter__(self):
-//        for x in range(len(self.matrix)):
-//            for y in range(len(self.matrix[x])):
-//                yield x, y, self.matrix[x][y]
 
     void change_the_era();
 };

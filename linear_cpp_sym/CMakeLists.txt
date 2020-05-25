@@ -16,6 +16,7 @@ endif ()
 #set(Boost_USE_MULTITHREAD ON)  # enable maltreating
 find_package(Boost COMPONENTS filesystem program_options REQUIRED)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+INCLUDE_DIRECTORIES("includes")
 
 file(GLOB_RECURSE SRC "includes/*.h" "src/*.cpp")
 

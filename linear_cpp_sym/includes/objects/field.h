@@ -8,12 +8,11 @@
 #include <vector>
 #include "person.h"
 #include <cinttypes>
-
+#include <map>
 
 class Field {
     size_t isolation_places;
     std::vector<std::vector<Person>> matrix{};
-    Statistics stats{};
 
     struct point {
         size_t x, y;
@@ -33,6 +32,8 @@ public:
     void infect(size_t x, size_t y);
 
     void change_the_era();
+
+    std::map<State, size_t> get_statistics();
 };
 
 #endif //LINEAR_CPP_SYM_FIELD_H

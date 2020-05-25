@@ -2,7 +2,7 @@
 // Created by fenix on 5/23/20.
 //
 
-#include "../../includes/objects/person.h"
+#include "objects/person.h"
 
 State Person::NoneState = State{};
 

@@ -2,7 +2,7 @@
 // Created by fenix on 5/23/20.
 //
 
-#include "../../includes/objects/state_obj.h"
+#include "objects/state_obj.h"
 
 State State::NoneState = State{};
 

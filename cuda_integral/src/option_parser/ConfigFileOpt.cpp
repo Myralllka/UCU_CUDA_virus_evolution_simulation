@@ -32,7 +32,7 @@ void ConfigFileOpt::init_opt_description() {
     opt_conf.add_options()
             ("abs_pres", po::value<double>(&abs_pars), "absolute precision")
             ("rel_pres", po::value<double>(&rel_pres), "relative precision")
-            ("flow_num", po::value<uint16_t>(&flow_num), "parallel execution flows number")
+            ("flow_num", po::value<ptrdiff_t>(&flow_num), "parallel execution flows number")
             ("init_steps", po::value<size_t>(&init_steps), "initial number of intervals to integrate")
             ("max_steps", po::value<size_t>(&max_steps), "max number of intervals to integrate")
             ("x.start", po::value<double>(&(x.first)), "start of the x region")

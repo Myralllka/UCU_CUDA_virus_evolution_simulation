@@ -47,12 +47,6 @@ double integrate(func_T func, size_t steps, const integration_args &int_ars) {
     double res = 0.0;
     integration_args int_arg_template{int_ars};
 
-//    ############# start of rectangular separation ###########
-//    steps = sqrt(steps); // steps per x or y
-//    int_arg_template.dx = (int_ars.end.x - int_ars.start.x) / steps;
-//    int_arg_template.dy = (int_ars.end.y - int_ars.start.y) / steps;
-//    ####################### end #############################
-
 //  dxy - the length of the side of one integration square
     double dxy = sqrt((int_ars.end.x - int_ars.start.x) * (int_ars.end.y - int_ars.start.y) / steps);
     int_arg_template.dx = dxy;
@@ -72,24 +66,18 @@ double integrate(func_T func, size_t steps, const integration_args &int_ars) {
 
     steps /= int_ars.flow_n; // steps per thread per x or y
 
-    for (uint16_t i = 0; i < int_ars.flow_n; ++i) {
+    for (ptrdiff_t i = 0; i < int_ars.flow_n; ++i) {
         int_arg_template.start.x = int_ars.start.x + int_arg_template.dx * steps * i;
         int_arg_template.end.x = int_ars.start.x + int_arg_template.dx * steps * (i + 1);
         v.emplace_back(// create config structure for etch thread
                 simple_integrate<func_T>, func, int_arg_template, &(v_res[i]));
-
-//        simple_integrate(func, int_arg_template, &(v_res[i]));
-//        std::cout << "\nIntegration flow " << i << std::endl;
-//        std::cout << "[" << int_ars.start.x + int_dx * i << ", " << int_ars.start.x + int_dx * (i + 1) << "]" << std::endl;
     }
-//    std::cout << "\nSteps " << steps * int_ars.flow_n << std::endl;
-//    std::cout << "============================ Experiment END ============================ " << std::endl;
 
-    for (uint16_t i = 0; i < int_ars.flow_n; ++i) {
+    for (ptrdiff_t i = 0; i < int_ars.flow_n; ++i) {
         v[i].join();
     }
 
-    for (uint16_t i = 0; i < int_ars.flow_n; ++i) {
+    for (ptrdiff_t i = 0; i < int_ars.flow_n; ++i) {
         res += v_res[i];
     }
     return res;

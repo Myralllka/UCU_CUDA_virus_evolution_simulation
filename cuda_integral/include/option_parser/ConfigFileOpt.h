@@ -5,14 +5,10 @@
 #ifndef LAB_2_PARALLEL_INTEGRATION_CONFIGFILEOPT_H
 #define LAB_2_PARALLEL_INTEGRATION_CONFIGFILEOPT_H
 
-#include <iostream>
+
 #include <string>
 #include <boost/program_options.hpp>
-#include <glob.h>
-#include <vector>
-#include <iterator>
-//#include <pair>
-#include <utility>
+
 
 class ConfigFileOpt {
 public:
@@ -26,7 +22,7 @@ public:
 
     double get_rel_pres() const { return rel_pres; }
 
-    uint16_t get_flow_num() const { return flow_num; }
+    ptrdiff_t get_flow_num() const { return flow_num; }
 
     size_t get_init_steps() const { return init_steps; }
 
@@ -53,7 +49,7 @@ private:
 
     double abs_pars = 0.0, rel_pres = 0.0;
     size_t init_steps = 0, max_steps = 0, m = 0;
-    uint16_t flow_num = 1;
+    ptrdiff_t flow_num = 1;
 
     std::vector<double> a1{}, a2{}, c{};
     std::pair<double, double>

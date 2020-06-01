@@ -83,5 +83,4 @@ double integrate(func_T func, size_t steps, const integration_args &int_ars) {
     return res;
 }
 
-
 #endif //LAB_2_PARALLEL_INTEGRATION_MANUAL_INTEGRATION_H

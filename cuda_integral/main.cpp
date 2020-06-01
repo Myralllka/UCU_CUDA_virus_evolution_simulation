@@ -23,16 +23,13 @@ inline static auto get_int_args_from_conf(const ConfigFileOpt &config) {
 
 
 int main(int argc, char *argv[]) {
-//  //////////////////////////// Program Parameter Parsing ////////////////////////////
-    std::string file_name = "../execution.conf";
+//  ##################### Program Parameter Parsing ######################
+    std::string file_name = "execution.conf";
     if (argc == 2) {
         file_name = argv[1];
     }
     if (argc > 2) {
-        std::cerr << "Too many arguments. Usage: \n"
-                     "<program>\n"
-                     "or\n"
-                     "<program> <config-filename>\n" << std::endl;
+        std::cerr << "Too many arguments. Usage: \n<program>\nor\n<program> <config-filename>\n" << std::endl;
         return 1;
     }
 
@@ -52,7 +49,7 @@ int main(int argc, char *argv[]) {
     auto before = get_current_time_fenced();
     double cur_res = integrate(langermann_f, steps, int_args);
 
-    double prev_res;
+    double prev_res = cur_res;
     bool to_continue = true;
     double abs_err = -1; // Just guard value
     double rel_err = -1; // Just guard value

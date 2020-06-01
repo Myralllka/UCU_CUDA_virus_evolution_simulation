@@ -7,8 +7,8 @@
 
 #define _USE_MATH_DEFINES
 
-#include "../math/integration_args.h"
-#include "cuda_assert.cuh"
+#include <math/integration_args.h>
+#include <cuda/cuda_assert.cuh>
 
 #define COEF_NUM 5
 #define MAX_THREAD_NUM 256

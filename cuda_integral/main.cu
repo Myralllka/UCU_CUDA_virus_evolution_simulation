@@ -1,7 +1,7 @@
 #include <iostream>
-#include "include/option_parser/ConfigFileOpt.h"
-#include "include/speed_tester.h"
-#include "include/cuda/cuda_integrate.cuh"
+#include <option_parser/ConfigFileOpt.h>
+#include <speed_tester.h>
+#include <cuda/cuda_integrate.cuh>
 
 
 inline static auto get_int_args_from_conf(const ConfigFileOpt &config) {

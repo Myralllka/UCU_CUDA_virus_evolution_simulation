@@ -5,7 +5,7 @@
 #ifndef LAB_2_PARALLEL_INTEGRATION_MANUAL_INTEGRATION_H
 #define LAB_2_PARALLEL_INTEGRATION_MANUAL_INTEGRATION_H
 
-#include "integration_args.h"
+#include <math/integration_args.h>
 #include <cstddef>
 #include <cassert>
 #include <thread>

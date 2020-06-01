@@ -2,8 +2,8 @@
 // Created by fenix on 2/25/20.
 //
 
-#include "../../include/option_parser/ConfigFileOpt.h"
-#include "../../include/option_parser/OptionsParseException.h"
+#include <option_parser/ConfigFileOpt.h>
+#include <option_parser/OptionsParseException.h>
 
 #include <boost/filesystem.hpp>
 #include <cassert>

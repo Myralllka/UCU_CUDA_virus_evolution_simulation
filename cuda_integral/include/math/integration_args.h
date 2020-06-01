@@ -5,7 +5,7 @@
 #ifndef LAB_2_PARALLEL_INTEGRATION_INTEGRATION_ARGS_H
 #define LAB_2_PARALLEL_INTEGRATION_INTEGRATION_ARGS_H
 
-#include "func_args.h"
+#include <math/func_args.h>
 #include <cstddef>
 
 struct integration_args {

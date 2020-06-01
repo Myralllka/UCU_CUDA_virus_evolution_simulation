@@ -2,7 +2,7 @@
 // Created by fenix on 2/25/20.
 //
 
-#include "../../include/math/langermann_f.h"
+#include <math/langermann_f.h>
 #include <cmath>
 
 

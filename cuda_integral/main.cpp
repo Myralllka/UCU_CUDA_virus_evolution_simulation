@@ -1,8 +1,8 @@
 #include <iostream>
-#include "include/option_parser/ConfigFileOpt.h"
-#include "include/speed_tester.h"
-#include "include/math/manual_integration.h"
-#include "include/math/langermann_f.h"
+#include <option_parser/ConfigFileOpt.h>
+#include <speed_tester.h>
+#include <math/manual_integration.h>
+#include <math/langermann_f.h>
 #include <cmath>
 #include <chrono>
 

@@ -1,6 +1,6 @@
 #include <iostream>
-#include "include/option_parser/ConfigFileOpt.h"
-#include "include/math/integration_args.h"
+#include <option_parser/ConfigFileOpt.h>
+#include <math/integration_args.h>
 
 #define COEF_NUM 5
 #define gpuErrorCheck(ans); { gpuAssert((ans), __FILE__, __LINE__); }
@@ -47,15 +47,14 @@ int main(int argc, char *argv[]) {
     const integration_args int_args = get_int_args_from_conf(config);
 
 
-    double *d_a1;
-    gpuErrorCheck(cudaMalloc(&d_a1,sizeof(double) * COEF_NUM))
+    double *d_a1;gpuErrorCheck(cudaMalloc(&d_a1, sizeof(double) * COEF_NUM))
 
     // Copy host vectors to device
     gpuErrorCheck(cudaMemcpy(d_a1, &config.get_a1()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice))
 //    gpuErrorCheck(cudaMemcpyToSymbol(&a1, &config.get_a1()[0], sizeof(double) * COEF_NUM, cudaMemcpyHostToDevice));
 
-    double a1_out[COEF_NUM];gpuErrorCheck(
-            cudaMemcpy(a1_out, d_a1, sizeof(double) * COEF_NUM, cudaMemcpyDeviceToHost));
+    double a1_out[COEF_NUM]; //
+    gpuErrorCheck(cudaMemcpy(a1_out, d_a1, sizeof(double) * COEF_NUM, cudaMemcpyDeviceToHost));
 
 
     for (int i = 0; i < COEF_NUM; ++i)

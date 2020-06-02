@@ -10,6 +10,7 @@
 #include <cassert>
 #include <thread>
 #include <vector>
+#include <cmath>
 
 
 // steps describe the number of steps for etch x and y separately

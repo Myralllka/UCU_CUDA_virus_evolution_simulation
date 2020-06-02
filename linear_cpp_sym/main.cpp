@@ -1,6 +1,6 @@
-#include "includes/objects/state_obj.h"
-#include "includes/objects/field.h"
-#include "includes/file_interface/conf_parser.h"
+#include "objects/state_obj.h"
+#include "objects/field.h"
+#include "file_interface/conf_parser.h"
 
 int main(int argc, char *argv[]) {
     //  ##################### Program Parameter Parsing ######################
@@ -40,10 +40,17 @@ int main(int argc, char *argv[]) {
 
     auto F = Field(config.field_size, config.isol_place);
     F.infect(random() % config.field_size, random() % config.field_size);
-    F.show();
+//    F.show();
 
     for (size_t i = 0; i < config.num_of_eras; ++i) {
-        F.show();
+        if (!((i / 10) % 10)) {
+//            F.show();
+            auto statistics = F.get_statistics();
+            for (auto elem : statistics) {
+                std::cout << " | " << elem.first << ": " << elem.second;
+            }
+            std::cout << std::endl;
+        }
         F.change_the_era();
     }
     F.show();

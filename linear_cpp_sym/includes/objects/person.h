@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "state_obj.h"
-#include "../state_functions.h"
+#include "state_functions.h"
 
 
 class Person {

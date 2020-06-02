@@ -1,9 +1,9 @@
 //
 // Created by fenix on 5/23/20.
 //
-#include "../../includes/objects/field.h"
+#include "objects/field.h"
 #include <iostream>
-#include "../../includes/objects/state_obj.h"
+#include "objects/state_obj.h"
 
 
 State NoneState = State{};
@@ -67,4 +67,14 @@ void Field::change_the_era() {
     for (auto &row : matrix)
         for (auto &person : row)
             person.evolute(&isolation_places);
+}
+
+std::map<State, size_t> Field::get_statistics() {
+    std::map<State, size_t> result;
+    for (auto &row:this->matrix) {
+        for (auto &col:row) {
+            ++result[col.get_state()];
+        }
+    }
+    return result;
 }

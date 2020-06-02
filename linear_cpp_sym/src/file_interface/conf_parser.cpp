@@ -1,7 +1,5 @@
-#include "../../includes/file_interface/conf_parser.h"
-#include "../../includes/file_interface/parser_exception.h"
-#include <boost/filesystem.hpp>
-#include <iostream>
+#include "file_interface/conf_parser.h"
+#include "file_interface/parser_exception.h"
 
 
 namespace po = boost::program_options;

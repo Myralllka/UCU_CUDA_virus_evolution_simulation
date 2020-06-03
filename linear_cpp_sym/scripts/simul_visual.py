@@ -19,11 +19,11 @@ def parse_file(f_name):
         iter_step = int(f.readline().strip())
         for line in f:
             normal, infected, patient, immunity, _isolated, dead = line.strip().split()
-            normal_a.append(normal)
-            infected_a.append(infected)
-            patient_a.append(patient)
-            immunity_a.append(immunity)
-            dead_a.append(dead)
+            normal_a.append(int(normal))
+            infected_a.append(int(infected))
+            patient_a.append(int(patient))
+            immunity_a.append(int(immunity))
+            dead_a.append(int(dead))
 
     return iter_step, normal_a, infected_a, patient_a, immunity_a, dead_a
 
@@ -37,7 +37,7 @@ def plot_one_iter(iter_steps, snapshot_num, **kwargs):
         plt.plot(step_arr, kwargs[key], label=key)
         plt.ylabel(key)
         plt.xlabel("era number")
-        # plt.grid(True)
+        plt.grid(True)
     plt.legend()
     plt.show()
 

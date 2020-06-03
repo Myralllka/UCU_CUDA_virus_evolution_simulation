@@ -80,7 +80,7 @@ void Person::evolute(size_t *isolation_places) {
             if (!is_transmissible()) (*isolation_places)++;
             next_state = random_state_choice(state.get().prob, States::immunity, States::dead);
         } else if (*isolation_places && is_transmissible()) {
-            std::cout << "test" << std::endl;
+//            std::cout << "test" << std::endl;
             *isolation_places -= 1;
             next_state = States::isolated;
         }

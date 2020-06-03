@@ -47,9 +47,9 @@ int main(int argc, char *argv[]) {
 //            F.show();
             auto statistics = F.get_statistics();
             for (auto elem : statistics) {
-                std::cout << " | " << elem.first << ": " << elem.second;
+//                std::cout << " | " << elem.first << ": " << elem.second;
             }
-            std::cout << std::endl;
+//            std::cout << std::endl;
         }
         F.change_the_era();
     }

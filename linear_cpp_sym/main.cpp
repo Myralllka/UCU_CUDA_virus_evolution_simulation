@@ -2,6 +2,9 @@
 #include "objects/field.h"
 #include "file_interface/conf_parser.h"
 
+#define PRINT_DELAY_ITERS 10
+
+
 int main(int argc, char *argv[]) {
     //  ##################### Program Parameter Parsing ######################
     std::string filename = "simulation.conf";
@@ -42,18 +45,21 @@ int main(int argc, char *argv[]) {
     F.infect(random() % config.field_size, random() % config.field_size);
 //    F.show();
 
+
+    std::cout << PRINT_DELAY_ITERS << std::endl;
     for (size_t i = 0; i < config.num_of_eras; ++i) {
-        if (!((i / 10) % 10)) {
+        if (!((i / PRINT_DELAY_ITERS) % PRINT_DELAY_ITERS)) {
 //            F.show();
             auto statistics = F.get_statistics();
-            for (auto elem : statistics) {
-//                std::cout << " | " << elem.first << ": " << elem.second;
+            // normal, immunity, infected, patient, isolated, dead;
+            for (size_t index = 0; index < STATES_NUM; ++index) {
+                std::cout << " " << statistics[*States::states_v[index]];
             }
-//            std::cout << std::endl;
+            std::cout << std::endl;
         }
         F.change_the_era();
     }
-    F.show();
+//    F.show();
 
     return 0;
 }

@@ -1,0 +1,3 @@
+matplotlib
+pycairo
+PySide2

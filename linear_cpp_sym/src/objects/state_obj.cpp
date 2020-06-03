@@ -14,6 +14,8 @@ State States::isolated = State{};
 State States::dead = State{};
 float States::crit_prob = 0.0f;
 uint8_t States::incubation_time = 1;
+const State *States::states_v[STATES_NUM] = {&States::normal, &States::immunity, &States::infected, &States::patient,
+                                             &States::isolated, &States::dead};
 
 State &State::operator()(int new_id, char new_repr, float new_prob, State &new_next) {
     id = new_id;

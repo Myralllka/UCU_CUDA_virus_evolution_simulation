@@ -8,7 +8,13 @@
 #include <vector>
 #include "person.h"
 #include <cinttypes>
-#include <map>
+#include <unordered_map>
+
+struct StateHasher {
+    uint8_t operator()(const State &s) const {
+        return s.id;
+    }
+};
 
 class Field {
     size_t isolation_places;
@@ -33,7 +39,7 @@ public:
 
     void change_the_era();
 
-    std::map<State, size_t> get_statistics();
+    std::unordered_map<State, size_t, StateHasher> get_statistics();
 };
 
 #endif //LINEAR_CPP_SYM_FIELD_H

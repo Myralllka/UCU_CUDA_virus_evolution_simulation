@@ -4,6 +4,7 @@
 #include "objects/field.h"
 #include <iostream>
 #include "objects/state_obj.h"
+#include <unordered_map>
 
 
 State NoneState = State{};
@@ -69,8 +70,8 @@ void Field::change_the_era() {
             person.evolute(&isolation_places);
 }
 
-std::map<State, size_t> Field::get_statistics() {
-    std::map<State, size_t> result;
+std::unordered_map<State, size_t, StateHasher> Field::get_statistics() {
+    std::unordered_map<State, size_t, StateHasher> result{{States::normal, 0}};
     for (auto &row:this->matrix) {
         for (auto &col:row) {
             ++result[col.get_state()];

@@ -7,6 +7,7 @@
 
 #include <cinttypes>
 #include <functional>
+#include <vector>
 
 // props bits
 #define STATE_INFECT    0b1000'0000
@@ -52,16 +53,25 @@ struct State {
 
     [[nodiscard]] bool operator!=(const State &other) const;
 
-    // TODO: check if valid
-    [[nodiscard]] operator char() const;
+    [[nodiscard]] explicit operator char() const;
 
     [[nodiscard]] bool mask_check(uint8_t mask) const;
 };
+
+
+#define NORMAL_INDEX        0
+#define IMMUNITY_INDEX      1
+#define INFECTED_INDEX      2
+#define PATIENT_INDEX       3
+#define ISOLATED_INDEX      4
+#define DEAD_INDEX          5
+#define STATES_NUM          6
 
 struct States {
     static State normal, immunity, infected, patient, isolated, dead;
     static float crit_prob;
     static uint8_t incubation_time;
+    const static State *states_v[STATES_NUM];
 };
 
 struct Statistics {

@@ -35,12 +35,13 @@ def plot_one_iter(iter_steps, snapshot_num, people_num, **kwargs):
     """
     step_arr = [step_id for step_id in range(0, iter_steps * snapshot_num, iter_steps)]
     for key in kwargs:
-        plt.plot(step_arr, tuple(map(lambda n: n / people_num, kwargs[key])), label=key)
-        plt.yticks([0., .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.])
+        plt.plot(step_arr, tuple(map(lambda n: n / people_num * 100, kwargs[key])), label=key)
+        plt.yticks([0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
         plt.ylabel(key)
         plt.xlabel("era number")
         plt.grid(True)
     plt.legend()
+    plt.ylabel("percentage from all number of  people")
     plt.show()
 
 

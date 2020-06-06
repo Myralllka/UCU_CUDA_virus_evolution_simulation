@@ -44,7 +44,6 @@ int main(int argc, char *argv[]) {
     F.infect(random() % config.field_size, random() % config.field_size);
 //    F.show();
 
-
     std::cout << PRINT_DELAY_ITERS << std::endl;
     std::cout << config.field_size * config.field_size << std::endl;
     for (size_t i = 0; i < config.num_of_eras; ++i) {

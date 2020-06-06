@@ -59,7 +59,7 @@ void Field::show() const {
 }
 
 void Field::infect(size_t x, size_t y) {
-    get_person(point{x, y}).set_timer(States::incubation_time);
+//    get_person(point{x, y}).set_timer(States::incubation_time);
     get_person(point{x, y}).become_infected();
 }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from sys import argv
-
+import math
 import matplotlib.pyplot as plt
 
 
@@ -10,22 +10,25 @@ def parse_file(f_name):
     Parse file and return fore  arrays with dead, infected, patient and with immunity with deceleration
     of printed eras of the simulation
     :param f_name: file name of the file to parse.
-    :return: [[normal(list), infected(list), patient(list), immunity(list), dead(list)], iter_step]
+    :return: [[general_number, immunity(list), infected(list), patient(list), isolated(list)], dead]
     """
     # result arrays
-    normal_a, infected_a, patient_a, immunity_a, dead_a = [], [], [], [], []
+    isolated_a, infected_a, patient_a, immunity_a, dead_a = [], [], [], [], []
 
     with open(f_name, 'r', encoding='utf-8') as f:
         iter_step = int(f.readline().strip())
+        normal = int(float(f.readline().strip()))
+        # print(normal)
         for line in f:
-            normal, infected, patient, immunity, _isolated, dead = line.strip().split()
-            normal_a.append(int(normal))
+            # print(line.strip().split())
+            immunity, infected, patient, isolated, dead = line.strip().split()
+            isolated_a.append(int(isolated))
             infected_a.append(int(infected))
             patient_a.append(int(patient))
             immunity_a.append(int(immunity))
             dead_a.append(int(dead))
 
-    return iter_step, normal_a, infected_a, patient_a, immunity_a, dead_a
+    return normal, immunity_a, infected_a, patient_a, isolated_a, dead_a
 
 
 def plot_one_iter(iter_steps, snapshot_num, **kwargs):
@@ -50,9 +53,9 @@ if __name__ == '__main__':
     else:
         raise Exception("Invalid params")
 
-    iter_step, normal_a, infected_a, patient_a, immunity_a, dead_a = parse_file(f_name)
-    plot_one_iter(iter_step, len(normal_a),
-                  normal_a=normal_a, infected_a=infected_a, patient_a=patient_a, immunity_a=immunity_a, dead_a=dead_a)
+    general, immunity_a, infected_a, patient_a, isolated_a, dead_a = parse_file(f_name)
+    plot_one_iter(1, len(infected_a), infected_a=infected_a, patient_a=patient_a, immunity_a=immunity_a,
+                  dead_a=dead_a, isolated_a=isolated_a)
 
     # digits in sub plot [num of rows, num of cols, index]
     # subplot(221)

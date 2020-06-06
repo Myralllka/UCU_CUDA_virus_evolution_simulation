@@ -2,7 +2,7 @@
 #include "objects/field.h"
 #include "file_interface/conf_parser.h"
 
-#define PRINT_DELAY_ITERS 10
+#define PRINT_DELAY_ITERS 1
 
 
 int main(int argc, char *argv[]) {
@@ -34,9 +34,9 @@ int main(int argc, char *argv[]) {
     States::immunity(IM_NORMAL_STATE_ID, 'm', 0.f, States::infected);
     States::infected(INFECTED_STATE_ID, '*', config.inf_to_pat, States::patient);
     States::patient(PATIENT_STATE_ID, '0', config.pat_to_dead, States::dead);
-    States::isolated(ISOLATED_STATE_ID, 'i', config.pat_to_dead, States::dead);
+    States::isolated(ISOLATED_STATE_ID, 'i', config.pat_to_dead / 10, States::dead);
     States::dead(DEAD_STATE_ID, ' ', config.dead_to_norm, States::normal);
-    States::crit_prob = config.crit_prob;
+    States::crit_prob = config.pat_to_dead;
     States::incubation_time = config.incub_time;
 
     srand(time(nullptr));
@@ -47,16 +47,15 @@ int main(int argc, char *argv[]) {
 
 
     std::cout << PRINT_DELAY_ITERS << std::endl;
+    std::cout << std::pow(config.field_size, 2)<< std::endl;
     for (size_t i = 0; i < config.num_of_eras; ++i) {
-        if (!((i / PRINT_DELAY_ITERS) % PRINT_DELAY_ITERS)) {
 //            F.show();
-            auto statistics = F.get_statistics();
-            // normal, immunity, infected, patient, isolated, dead;
-            for (size_t index = 0; index < STATES_NUM; ++index) {
-                std::cout << " " << statistics[*States::states_v[index]];
-            }
-            std::cout << std::endl;
+        auto statistics = F.get_statistics();
+        // immunity, infected, patient, isolated, dead;
+        for (auto &index : States::states_v) {
+            if (*index != States::normal) std::cout << " " << statistics[*index];
         }
+        std::cout << std::endl;
         F.change_the_era();
     }
 //    F.show();

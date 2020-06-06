@@ -21,8 +21,8 @@ def parse_file(f_name):
             immunity, infected, patient, isolated, dead = line.strip().split()
             isolated_a.append(int(isolated))
             # Total infected
-            infected_a.append(int(infected) + int(isolated) + int(patient) + int(immunity) + int(dead))
-            patient_a.append(int(patient))
+            infected_a.append(int(infected))
+            patient_a.append(int(patient) + int(isolated))
             immunity_a.append(int(immunity))
             dead_a.append(int(dead))
 

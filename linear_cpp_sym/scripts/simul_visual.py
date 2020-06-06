@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 from sys import argv
-import math
 import matplotlib.pyplot as plt
 
 
@@ -10,34 +9,34 @@ def parse_file(f_name):
     Parse file and return fore  arrays with dead, infected, patient and with immunity with deceleration
     of printed eras of the simulation
     :param f_name: file name of the file to parse.
-    :return: [[general_number, immunity(list), infected(list), patient(list), isolated(list)], dead]
+    :return: [[general_people_number, immunity(list), infected(list), patient(list), isolated(list)], dead]
     """
     # result arrays
     isolated_a, infected_a, patient_a, immunity_a, dead_a = [], [], [], [], []
 
     with open(f_name, 'r', encoding='utf-8') as f:
         iter_step = int(f.readline().strip())
-        normal = int(float(f.readline().strip()))
-        # print(normal)
+        people_num = int(f.readline().strip())
         for line in f:
-            # print(line.strip().split())
             immunity, infected, patient, isolated, dead = line.strip().split()
             isolated_a.append(int(isolated))
-            infected_a.append(int(infected))
+            # Total infected
+            infected_a.append(int(infected) + int(isolated) + int(patient) + int(immunity) + int(dead))
             patient_a.append(int(patient))
             immunity_a.append(int(immunity))
             dead_a.append(int(dead))
 
-    return normal, immunity_a, infected_a, patient_a, isolated_a, dead_a
+    return iter_step, people_num, immunity_a, infected_a, patient_a, isolated_a, dead_a
 
 
-def plot_one_iter(iter_steps, snapshot_num, **kwargs):
+def plot_one_iter(iter_steps, snapshot_num, people_num, **kwargs):
     """
     visualize the arrays
     """
     step_arr = [step_id for step_id in range(0, iter_steps * snapshot_num, iter_steps)]
     for key in kwargs:
-        plt.plot(step_arr, kwargs[key], label=key)
+        plt.plot(step_arr, tuple(map(lambda n: n / people_num, kwargs[key])), label=key)
+        plt.yticks([0., .1, .2, .3, .4, .5, .6, .7, .8, .9, 1.])
         plt.ylabel(key)
         plt.xlabel("era number")
         plt.grid(True)
@@ -52,9 +51,8 @@ if __name__ == '__main__':
         f_name = argv[1]
     else:
         raise Exception("Invalid params")
-
-    general, immunity_a, infected_a, patient_a, isolated_a, dead_a = parse_file(f_name)
-    plot_one_iter(1, len(infected_a), infected_a=infected_a, patient_a=patient_a, immunity_a=immunity_a,
+    iter_step, people_num, immunity_a, infected_a, patient_a, isolated_a, dead_a = parse_file(f_name)
+    plot_one_iter(iter_step, len(infected_a), people_num, infected_a=infected_a, patient_a=patient_a, immunity_a=immunity_a,
                   dead_a=dead_a, isolated_a=isolated_a)
 
     # digits in sub plot [num of rows, num of cols, index]

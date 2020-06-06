@@ -37,7 +37,6 @@ int main(int argc, char *argv[]) {
     States::isolated(ISOLATED_STATE_ID, 'i', config.pat_to_dead / 10, States::dead);
     States::dead(DEAD_STATE_ID, ' ', config.dead_to_norm, States::normal);
     States::crit_prob = config.pat_to_dead;
-    States::incubation_time = config.incub_time;
 
     srand(time(nullptr));
 
@@ -47,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 
     std::cout << PRINT_DELAY_ITERS << std::endl;
-    std::cout << std::pow(config.field_size, 2)<< std::endl;
+    std::cout << config.field_size * config.field_size << std::endl;
     for (size_t i = 0; i < config.num_of_eras; ++i) {
 //            F.show();
         auto statistics = F.get_statistics();

@@ -15,11 +15,15 @@ public:
     void parse(const std::string &file_name);
 
     // declare all parameters
-    size_t incub_time = 0;
-    size_t isol_place = 0, field_size = 0, num_of_eras = 0;
-//    float crit_prob = .0f;
-    float norm_to_inf = .0f, inf_to_pat = .0f, pat_to_dead = .0f, dead_to_norm = .0f;
-    //    size_t threads = 0;
+    size_t isol_place = 0;
+    size_t field_size = 0;
+    size_t num_of_eras = 0;
+
+    float norm_to_inf = .0f;
+    float inf_to_pat = .0f;
+    float pat_to_dead = .0f;
+    float dead_to_norm = .0f;
+    float crit_prob = .0f;
 
 private:
     void init_opt_description();

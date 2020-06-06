@@ -61,29 +61,18 @@ char Person::get_repr() const {
 bool Person::try_infect() {
     if (next_state.get() == States::normal) {
         next_state = random_state_choice(next_state.get().prob, next_state, States::infected);
-//        if (States::infected == next_state) {
-//            state_timer = States::incubation_time;
-//            return true;
-//        }
     }
     return false;
 }
 
 void Person::evolute(size_t *isolation_places) {
     if (state.get() == States::infected) {
-        next_state = random_state_choice(static_cast<float>(States::incubation_time) / 100,
-                                         States::infected,
-                                         States::patient);
-//        if (state_timer > 0)
-//            state_timer -= 1;
-//        else
-//            next_state = States::patient;
+        next_state = random_state_choice(States::infected.prob, States::infected, States::patient);
     } else if (state.get() == States::patient) {
         if (random_bool(States::crit_prob)) {
             if (!is_transmissible()) (*isolation_places)++;
             next_state = random_state_choice(state.get().prob, States::immunity, States::dead);
         } else if (*isolation_places && is_transmissible()) {
-//            std::cout << "test" << std::endl;
             *isolation_places -= 1;
             next_state = States::isolated;
         }

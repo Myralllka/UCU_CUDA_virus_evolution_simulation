@@ -12,13 +12,12 @@ void ConfigFileOpt::init_opt_description() {
     opt_conf.add_options()
             ("field_size", po::value<size_t>(&field_size), "field size")
             ("num_of_eras", po::value<size_t>(&num_of_eras), "number of eras")
-            ("incub_time", po::value<size_t>(&incub_time), "incubation time")
             ("isol_place", po::value<size_t>(&isol_place), "relative precision")
             // CAN BE CHANGED TO `crit_prob`
-//            ("crit_prob", po::value<float>(&crit_prob), "probability to die or get health from ill state")
-            ("prob.norm_to_inf", po::value<float>(&norm_to_inf), "healthy to infected probability")
-            ("prob.inf_to_pat", po::value<float>(&inf_to_pat), "infected to patient probability")
-            ("prob.pat_to_dead", po::value<float>(&pat_to_dead), "patient to inactive probability")
+            ("prob.patient_coefficient", po::value<float>(&crit_prob), "probability to die or get health from ill state")
+            ("prob.healthy_to_infected", po::value<float>(&norm_to_inf), "healthy to infected probability")
+            ("prob.infected_to_patient", po::value<float>(&inf_to_pat), "infected to patient probability")
+            ("prob.patient_to_dead", po::value<float>(&pat_to_dead), "patient to inactive probability")
             ("prob.dead_to_norm", po::value<float>(&dead_to_norm), "inactive to healthy probability");
 
 }

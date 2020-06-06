@@ -70,7 +70,6 @@ struct State {
 struct States {
     static State normal, immunity, infected, patient, isolated, dead;
     static float crit_prob;
-    static uint8_t incubation_time;
     const static State *states_v[STATES_NUM];
 };
 

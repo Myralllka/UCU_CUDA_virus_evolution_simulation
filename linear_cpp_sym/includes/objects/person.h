@@ -33,7 +33,7 @@ public:
 
     [[nodiscard]] bool has_immunity() const;
 
-    void try_infect();
+    bool try_infect();
 
     void become_healthy();
 

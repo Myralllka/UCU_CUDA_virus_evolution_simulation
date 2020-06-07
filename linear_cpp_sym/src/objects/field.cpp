@@ -9,6 +9,18 @@
 
 State NoneState = State{};
 
+Field::Field(size_t f_size, size_t isolation_places) : isolation_places(isolation_places) {
+    for (size_t i = 0; i < f_size; ++i) {
+        std::vector<Person> new_vector(f_size);
+        for (size_t j = 0; j < f_size; ++j) {
+            new_vector[j] = Person(States::normal, States::normal);
+        }
+        matrix.emplace_back(new_vector);
+    }
+    statistics = std::unordered_map<State, size_t, StateHasher>{{States::normal, f_size * f_size}};
+    statistics[States::normal] = f_size * f_size;
+}
+
 std::vector<Field::point> Field::infect_range(size_t x, size_t y) const {
     const std::vector<point> check_range = {{x + 1, y},
                                             {x,     y + 1},
@@ -23,6 +35,12 @@ std::vector<Field::point> Field::infect_range(size_t x, size_t y) const {
     return res_range;
 }
 
+void Field::infect(size_t x, size_t y) {
+    get_person(point{x, y}).become_infected();
+    ++statistics[States::infected];
+    --statistics[States::normal];
+}
+
 Person &Field::get_person(const Field::point &p) {
     return matrix[p.x][p.y];
 }
@@ -35,33 +53,6 @@ void Field::execute_interactions() {
                 for (const auto &pos : infect_range(x, y))
                     get_person(pos).try_infect();
         }
-}
-
-Field::Field(size_t f_size, size_t isolation_places) : isolation_places(isolation_places) {
-    for (size_t i = 0; i < f_size; ++i) {
-        std::vector<Person> new_vector(f_size);
-        for (size_t j = 0; j < f_size; ++j) {
-            new_vector[j] = Person(States::normal, States::normal);
-        }
-        matrix.emplace_back(new_vector);
-    }
-    statistics = std::unordered_map<State, size_t, StateHasher>{{States::normal, f_size * f_size}};
-}
-
-void Field::show() const {
-    for (const auto &row : matrix) {
-        std::cout << "|";
-        for (const Person &p : row) {
-            std::cout << " " << p.get_repr() << " |";
-        }
-        std::cout << "\n";
-    }
-    std::cout << "\n========================================" << std::endl;
-}
-
-void Field::infect(size_t x, size_t y) {
-    get_person(point{x, y}).become_infected();
-    ++statistics[States::infected];
 }
 
 void Field::change_the_era() {
@@ -84,4 +75,16 @@ std::unordered_map<State, size_t, StateHasher> Field::get_statistics() {
 //    }
 //    std::cout  << " -----" << std::endl;
     return statistics;
+}
+
+
+void Field::show() const {
+    for (const auto &row : matrix) {
+        std::cout << "|";
+        for (const Person &p : row) {
+            std::cout << " " << p.get_repr() << " |";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n========================================" << std::endl;
 }

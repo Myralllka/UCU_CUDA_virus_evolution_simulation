@@ -1,6 +1,7 @@
 #include "objects/state_obj.h"
 #include "objects/field.h"
 #include "file_interface/conf_parser.h"
+
 #define PRINT_DELAY_ITERS 1
 
 int main(int argc, char *argv[]) {
@@ -46,7 +47,9 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < config.num_of_eras; ++i) {
 //            F.show();
         auto statistics = F.get_statistics();
-        // immunity, infected, patient, isolated, dead;
+        if (statistics[States::immunity] + statistics[States::dead]  == config.field_size * config.field_size - 1)
+            break;
+        // normal, immunity, infected, patient, isolated, dead;
         for (auto &index : States::states_vector) {
             if (*index != States::normal) std::cout << " " << statistics[*index];
         }

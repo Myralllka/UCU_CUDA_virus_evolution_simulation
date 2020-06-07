@@ -58,6 +58,18 @@ struct State {
     [[nodiscard]] bool mask_check(uint8_t mask) const;
 };
 
+struct StateHasher {
+    uint8_t operator()(const State &s) const {
+        return s.id;
+    }
+};
+
+#define NORMAL_STATE_CHAR char('.')
+#define IM_NORMAL_STATE_CHAR char('m')
+#define INFECTED_STATE_CHAR char('*')
+#define PATIENT_STATE_CHAR char('0')
+#define ISOLATED_STATE_CHAR char('i')
+#define DEAD_STATE_CHAR char(' ')
 
 #define NORMAL_INDEX        0
 #define IMMUNITY_INDEX      1
@@ -69,8 +81,8 @@ struct State {
 
 struct States {
     static State normal, immunity, infected, patient, isolated, dead;
-    static float crit_prob;
-    const static State *states_v[STATES_NUM];
+    static float patient_coef;
+    const static State *states_vector[STATES_NUM];
 };
 
 struct Statistics {

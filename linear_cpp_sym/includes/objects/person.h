@@ -11,7 +11,6 @@ class Person {
 private:
     static State NoneState;
     std::reference_wrapper<State> state = NoneState, next_state = NoneState;
-    uint8_t state_timer = 0;
 
 public:
     Person() = default;
@@ -28,13 +27,17 @@ public:
 
     [[nodiscard]] bool is_healthy() const;
 
-    [[nodiscard]] bool is_transmissible() const;
+    [[nodiscard]] bool is_infectious() const;
+
+    [[nodiscard]] bool is_isolated() const;
 
     [[nodiscard]] bool has_immunity() const;
 
-    bool try_infect();
+    void try_infect();
 
     void become_healthy();
+
+    void become_isolated();
 
     void become_infected();
 
@@ -44,5 +47,5 @@ public:
 
     [[nodiscard]] char get_repr() const;
 
-    void evolute(size_t *isolation_places);
+    uint8_t evolute(size_t *isolation_places, std::unordered_map<State, size_t, StateHasher> &statistics) ;
 };

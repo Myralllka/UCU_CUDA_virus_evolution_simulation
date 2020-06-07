@@ -10,12 +10,6 @@
 #include <cinttypes>
 #include <unordered_map>
 
-struct StateHasher {
-    uint8_t operator()(const State &s) const {
-        return s.id;
-    }
-};
-
 class Field {
     size_t isolation_places;
     std::vector<std::vector<Person>> matrix{};
@@ -27,6 +21,8 @@ class Field {
     [[nodiscard]] std::vector<point> infect_range(size_t x, size_t y) const;
 
     [[nodiscard]] Person &get_person(const point &p);
+
+    std::unordered_map<State, size_t, StateHasher> statistics;
 
     void execute_interactions();
 

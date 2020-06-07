@@ -31,7 +31,7 @@ void Field::execute_interactions() {
     for (size_t x = 0; x < matrix.size(); ++x)
         for (size_t y = 0; y < matrix[x].size(); ++y) {
             const auto &temp_person = matrix[x][y];
-            if (temp_person.is_alive() && (temp_person.is_infected() || temp_person.is_patient()))
+            if (temp_person.is_alive() && ((temp_person.is_infected() || temp_person.is_patient())))
                 for (const auto &pos : infect_range(x, y))
                     get_person(pos).try_infect();
         }
@@ -45,6 +45,7 @@ Field::Field(size_t f_size, size_t isolation_places) : isolation_places(isolatio
         }
         matrix.emplace_back(new_vector);
     }
+    statistics = std::unordered_map<State, size_t, StateHasher>{{States::normal, f_size * f_size}};
 }
 
 void Field::show() const {
@@ -59,23 +60,28 @@ void Field::show() const {
 }
 
 void Field::infect(size_t x, size_t y) {
-//    get_person(point{x, y}).set_timer(States::incubation_time);
     get_person(point{x, y}).become_infected();
+    ++statistics[States::infected];
 }
 
 void Field::change_the_era() {
     execute_interactions();
     for (auto &row : matrix)
-        for (auto &person : row)
-            person.evolute(&isolation_places);
+        for (auto &person : row) {
+            person.evolute(&isolation_places, statistics);
+        }
 }
 
 std::unordered_map<State, size_t, StateHasher> Field::get_statistics() {
-    std::unordered_map<State, size_t, StateHasher> result{{States::normal, 0}};
-    for (auto &row:this->matrix) {
-        for (auto &col:row) {
-            ++result[col.get_state()];
-        }
-    }
-    return result;
+//    std::unordered_map<State, size_t, StateHasher> result{{States::normal, 0}};
+//    for (auto &row:matrix) {
+//        for (auto &col:row) {
+//            ++result[col.get_state()];
+//        }
+//    }
+//    for (auto &index : States::states_vector) {
+//        if (*index != States::normal) std::cout << " " << result[*index];
+//    }
+//    std::cout  << " -----" << std::endl;
+    return statistics;
 }

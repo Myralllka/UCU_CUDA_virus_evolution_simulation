@@ -13,10 +13,10 @@ void ConfigFileOpt::init_opt_description() {
             ("field_size", po::value<size_t>(&field_size), "field size")
             ("num_of_eras", po::value<size_t>(&num_of_eras), "number of eras")
             ("isol_place", po::value<size_t>(&isol_place), "relative precision")
-            ("prob.patient_coefficient", po::value<float>(&crit_prob), "probability to die or get health from ill state")
-            ("prob.healthy_to_infected", po::value<float>(&norm_to_inf), "healthy to infected probability")
-            ("prob.infected_to_patient", po::value<float>(&inf_to_pat), "infected to patient probability")
-            ("prob.patient_to_dead", po::value<float>(&pat_to_dead), "patient to inactive probability");
+            ("prob.patient_coefficient", po::value<float>(&patient_coefficient), "probability to die or get health from ill state")
+            ("prob.healthy_to_infected", po::value<float>(&healthy_to_infected), "healthy to infected probability")
+            ("prob.infected_to_patient", po::value<float>(&infected_to_patient), "infected to patient probability")
+            ("prob.patient_to_dead", po::value<float>(&patient_to_dead), "patient to inactive probability");
 
 }
 

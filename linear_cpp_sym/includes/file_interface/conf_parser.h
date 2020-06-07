@@ -19,10 +19,10 @@ public:
     size_t field_size = 0;
     size_t num_of_eras = 0;
 
-    float norm_to_inf = .0f;
-    float inf_to_pat = .0f;
-    float pat_to_dead = .0f;
-    float crit_prob = .0f;
+    float healthy_to_infected = .0f;
+    float infected_to_patient = .0f;
+    float patient_to_dead = .0f;
+    float patient_coefficient = .0f;
 
 private:
     void init_opt_description();

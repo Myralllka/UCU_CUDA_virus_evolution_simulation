@@ -22,7 +22,7 @@ def parse_file(f_name):
             isolated_a.append(int(isolated))
             # Total infected
             infected_a.append(int(infected))
-            patient_a.append(int(patient) + int(isolated))
+            patient_a.append(int(patient))
             immunity_a.append(int(immunity))
             dead_a.append(int(dead))
 
@@ -53,8 +53,8 @@ if __name__ == '__main__':
     else:
         raise Exception("Invalid params")
     iter_step, people_num, immunity_a, infected_a, patient_a, isolated_a, dead_a = parse_file(f_name)
-    plot_one_iter(iter_step, len(infected_a), people_num, infected_a=infected_a, patient_a=patient_a, immunity_a=immunity_a,
-                  dead_a=dead_a, isolated_a=isolated_a)
+    plot_one_iter(iter_step, len(infected_a), people_num, infected_a=infected_a, patient_a=patient_a,
+                  immunity_a=immunity_a, dead_a=dead_a, isolated_a=isolated_a)
 
     # digits in sub plot [num of rows, num of cols, index]
     # subplot(221)

@@ -11,7 +11,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif ()
 
-set(CMAKE_BUILD_TYPE  Release)
+#set(CMAKE_BUILD_TYPE  Release)
 #find_package(Threads REQUIRED)
 #set(Boost_USE_STATIC_LIBS OFF) # enable dynamic linking
 #set(Boost_USE_MULTITHREAD ON)  # enable maltreating

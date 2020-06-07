@@ -35,7 +35,6 @@ int main(int argc, char *argv[]) {
     States::infected(INFECTED_STATE_ID, '*', config.inf_to_pat, States::patient);
     States::patient(PATIENT_STATE_ID, '0', config.pat_to_dead, States::dead);
     States::isolated(ISOLATED_STATE_ID, 'i', config.pat_to_dead / 10, States::dead);
-    States::dead(DEAD_STATE_ID, ' ', config.dead_to_norm, States::normal);
     States::crit_prob = config.pat_to_dead;
 
     srand(time(nullptr));

@@ -22,7 +22,6 @@ public:
     float norm_to_inf = .0f;
     float inf_to_pat = .0f;
     float pat_to_dead = .0f;
-    float dead_to_norm = .0f;
     float crit_prob = .0f;
 
 private:

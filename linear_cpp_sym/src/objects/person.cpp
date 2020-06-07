@@ -6,10 +6,6 @@
 
 State Person::NoneState = State{};
 
-//void Person::set_timer(uint8_t t) {
-//    state_timer = t;
-//}
-
 State &Person::get_state() const {
     return state.get();
 }

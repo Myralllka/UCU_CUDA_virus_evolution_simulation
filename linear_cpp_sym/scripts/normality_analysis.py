@@ -36,10 +36,10 @@ def parse_file(f_name):
 
 
 def dict_of_files(num_of_files):
-    '''
+    """
     Create dictionary where [keys] - numbers of parsed file, [value] - list of lists with corresponding to file
     data for different statistics (from naming).
-    '''
+    """
     all_statistics = dict()
     for i in range(1, num_of_files + 1):
         f_name = "../res/snap%i.txt" % i
@@ -48,10 +48,10 @@ def dict_of_files(num_of_files):
 
 
 def data_filtering(all_statistics_dict: dict, gap):
-    '''
+    """
     Return dictionary with filtered data by the gap (each [gap]th recording from file)
     with [key] - statistic (from naming), [value] - gathered data from 'raw' dictionary.
-    '''
+    """
     result = dict()
     for i in all_statistics_dict:
         for prop in range(2, 7):
@@ -63,11 +63,11 @@ def data_filtering(all_statistics_dict: dict, gap):
 
 
 def normality_test(filtered_dict):
-    '''
+    """
     Tests the sequence with 2-sided chi squared test and write to the [tests_outcome]
     n - if normally distributed
     . - if not
-    '''
+    """
     print("\nGAP = ", tmp_gap)
 
     for prop in naming[2:]:

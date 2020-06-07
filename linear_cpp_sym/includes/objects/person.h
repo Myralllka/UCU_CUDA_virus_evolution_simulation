@@ -18,8 +18,6 @@ public:
 
     Person(State &set_state, State &nextState) : state(std::ref(set_state)), next_state(std::ref(nextState)) {}
 
-    void set_timer(uint8_t t);
-
     [[nodiscard]] State &get_state() const;
 
     [[nodiscard]] bool is_alive() const;
@@ -44,7 +42,7 @@ public:
 
     void become_dead();
 
-    char get_repr() const;
+    [[nodiscard]] char get_repr() const;
 
     void evolute(size_t *isolation_places);
 };

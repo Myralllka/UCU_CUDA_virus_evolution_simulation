@@ -6,7 +6,6 @@
 #define LAB_2_PARALLEL_INTEGRATION_SPEED_TESTER_H
 
 #include <chrono>
-
 #include <atomic>
 #include <cassert>
 

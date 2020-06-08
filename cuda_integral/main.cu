@@ -1,24 +1,7 @@
 #include <iostream>
-#include "include/option_parser/ConfigFileOpt.h"
-#include "include/speed_tester.h"
-#include "include/cuda/cuda_integrate.cuh"
-
-#define PRINT_INTERMEDIATE_STEPS
-
-
-inline static auto get_int_args_from_conf(const ConfigFileOpt &config) {
-    return integration_args{
-            point{config.get_x().first, config.get_y().first},
-            point{config.get_x().second, config.get_y().second},
-            f_params{
-                    config.get_m(),
-                    config.get_c(),
-                    config.get_a1(),
-                    config.get_a2()
-            },
-            config.get_flow_num()
-    };
-}
+#include <option_parser/ConfigFileOpt.h>
+#include <speed_tester.h>
+#include <cuda/cuda_integrate.cuh>
 
 
 int main(int argc, char *argv[]) {
@@ -26,11 +9,8 @@ int main(int argc, char *argv[]) {
     std::string file_name = "execution.conf";
     if (argc == 2) {
         file_name = argv[1];
-    }
-    if (argc > 2) {
-        std::cerr << "Too many arguments. Usage: \n"
-                     "<program>\n"
-                     "or\n"
+    } else if (argc > 2) {
+        std::cerr << "Too many arguments. Usage:  <program> or "
                      "<program> <config-filename>\n" << std::endl;
         return 1;
     }
@@ -46,10 +26,9 @@ int main(int argc, char *argv[]) {
 
 //  ////////////////////////////   Integration Initiation   ////////////////////////////
     size_t steps = config.get_init_steps();
-    const integration_args int_args = get_int_args_from_conf(config);
 
     auto before = get_current_time_fenced();
-    double cur_res = cuda_integrate(steps, int_args);
+    double cur_res = cuda_integrate(steps, config);
 
     double prev_res;
     bool to_continue = true;
@@ -64,7 +43,8 @@ int main(int argc, char *argv[]) {
 #endif
         prev_res = cur_res;
         steps *= 2;
-        cur_res = cuda_integrate(steps, int_args);
+        cur_res = cuda_integrate(steps, config);
+        std::cout << cur_res << std::endl;
         abs_err = fabs(cur_res - prev_res);
         rel_err = fabs((cur_res - prev_res) / cur_res);
 #ifdef PRINT_INTERMEDIATE_STEPS
@@ -77,9 +57,8 @@ int main(int argc, char *argv[]) {
 
     auto time_to_calculate = get_current_time_fenced() - before;
 
-
 //  ////////////////////////////   Program Output Block   ////////////////////////////#
-//    std::cout << "Steps: " << steps << std::endl;
+    std::cout << "Steps: " << steps << std::endl;
     std::cout << "Flows: " << config.get_flow_num() << std::endl;
     std::cout << "Result = " << cur_res << std::endl;
     std::cout << "Absolute_error = " << abs_err << std::endl;

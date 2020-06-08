@@ -40,17 +40,27 @@ __global__ void
 cuda_thread_integrate(const double start_x, const double end_x, double start_y, double end_y, double dxy,
                       size_t steps_per_thread, double *res, const double *d_c, const double *d_a1,
                       const double *d_a2) {
+    // cashed_device "array name" [size]
+    __shared__ double ch_d_c[COEF_NUM], ch_d_a1[COEF_NUM], ch_d_a2[COEF_NUM];
+    if (threadIdx.x == 0)
+        for (int i = 0; i < COEF_NUM; ++i) {
+            ch_d_c[i] = d_c[i];
+            ch_d_a1[i] = d_a1[i];
+            ch_d_a2[i] = d_a2[i];
+        }
 
-    double l_res = 0.0; // local result
+//    __shared__ double local_res[MAX_THREAD_NUM]; // local result
+    double diag, l_res = 0.0; // local result
     start_y += dxy * steps_per_thread * threadIdx.x;
     end_y = start_y + dxy * steps_per_thread;
 
-    double x = start_x, y = start_y, diag;
+    double x = start_x, y = start_y;
+    __syncthreads();
     while (y < end_y) {
         while (x < end_x) {
             for (uint8_t i = 0; i < COEF_NUM; ++i) {
-                diag = (x - d_a1[i]) * (x - d_a1[i]) + (y - d_a2[i]) * (y - d_a2[i]);
-                l_res += d_c[i] * exp(-diag / static_cast<double >(M_PI)) * cos(static_cast<double >(M_PI) * diag);
+                diag = (x - ch_d_a1[i]) * (x - ch_d_a1[i]) + (y - ch_d_a2[i]) * (y - ch_d_a2[i]);
+                l_res += ch_d_c[i] * exp(-diag / static_cast<double>(M_PI)) * cos(static_cast<double>(M_PI) * diag);
             }
             x += dxy;
         }

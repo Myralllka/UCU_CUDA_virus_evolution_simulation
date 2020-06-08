@@ -21,6 +21,8 @@ include_directories("include")
 add_executable(cuda_integral main.cu
         include/cuda_impl/cuda_integrate.cuh src/cuda_impl/cuda_integrate.cu
         include/cuda_impl/cuda_assert.cuh
+        include/option_parser/ConfigFileOpt.h src/option_parser/ConfigFileOpt.cpp
+        include/option_parser/OptionsParseException.h
         )
 set_target_properties(
         cuda_integral

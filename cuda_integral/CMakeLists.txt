@@ -21,8 +21,8 @@ include_directories("include")
 file(GLOB_RECURSE SRC "include/*.h" "src/*.cpp")
 
 add_executable(cuda_integral main.cu
-        include/cuda/cuda_integrate.cuh
-        include/cuda/cuda_assert.cuh
+        include/cuda_impl/cuda_integrate.cuh
+        include/cuda_impl/cuda_assert.cuh
         ${SRC})
 set_target_properties(
         cuda_integral

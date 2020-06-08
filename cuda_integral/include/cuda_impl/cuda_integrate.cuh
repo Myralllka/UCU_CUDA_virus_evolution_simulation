@@ -5,7 +5,7 @@
 #ifndef CUDA_INTEGRAL_CUDA_INTEGRATE_CUH
 #define CUDA_INTEGRAL_CUDA_INTEGRATE_CUH
 
-#include <cuda/cuda_assert.cuh>
+#include <cuda_impl/cuda_assert.cuh>
 #include <iostream>
 
 

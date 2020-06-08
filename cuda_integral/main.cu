@@ -1,7 +1,7 @@
 #include <iostream>
 #include <option_parser/ConfigFileOpt.h>
 #include <speed_tester.h>
-#include <cuda/cuda_integrate.cuh>
+#include <cuda_impl/cuda_integrate.cuh>
 
 
 int main(int argc, char *argv[]) {

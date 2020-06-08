@@ -18,27 +18,27 @@ public:
 
     void parse(const std::string &file_name);
 
-    const double &get_abs_pars() const { return abs_pars; }
+    [[nodiscard]] const double &get_abs_pars() const { return abs_pars; }
 
-    const double &get_rel_pres() const { return rel_pres; }
+    [[nodiscard]] const double &get_rel_pres() const { return rel_pres; }
 
-    const ptrdiff_t &get_flow_num() const { return flow_num; }
+    [[nodiscard]] const ptrdiff_t &get_flow_num() const { return flow_num; }
 
-    const size_t &get_init_steps() const { return init_steps; }
+    [[nodiscard]] const size_t &get_init_steps() const { return init_steps; }
 
-    const size_t &get_max_steps() const { return max_steps; }
+    [[nodiscard]] const size_t &get_max_steps() const { return max_steps; }
 
-    const size_t &get_m() const { return m; }
+    [[nodiscard]] const size_t &get_m() const { return m; }
 
-    const std::vector<double> &get_a1() const { return a1; }
+    [[nodiscard]] const std::vector<double> &get_a1() const { return a1; }
 
-    const std::vector<double> &get_a2() const { return a2; }
+    [[nodiscard]] const std::vector<double> &get_a2() const { return a2; }
 
-    const std::vector<double> &get_c() const { return c; }
+    [[nodiscard]] const std::vector<double> &get_c() const { return c; }
 
-    const std::pair<double, double> &get_x() const { return x; }
+    [[nodiscard]] const std::pair<double, double> &get_x() const { return x; }
 
-    const std::pair<double, double> &get_y() const { return y; }
+    [[nodiscard]] const std::pair<double, double> &get_y() const { return y; }
 
 private:
     void init_opt_description();

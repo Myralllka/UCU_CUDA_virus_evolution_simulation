@@ -18,12 +18,10 @@ find_package(Boost COMPONENTS filesystem program_options system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 include_directories("include")
 
-file(GLOB_RECURSE SRC "include/*.h" "src/*.cpp")
-
 add_executable(cuda_integral main.cu
-        include/cuda_impl/cuda_integrate.cuh
+        include/cuda_impl/cuda_integrate.cuh src/cuda_impl/cuda_integrate.cu
         include/cuda_impl/cuda_assert.cuh
-        ${SRC})
+        )
 set_target_properties(
         cuda_integral
         PROPERTIES
@@ -31,6 +29,7 @@ set_target_properties(
 target_link_libraries(cuda_integral LINK_PUBLIC ${Boost_LIBRARIES})
 
 
+#file(GLOB_RECURSE SRC "include/*.h" "include/*.cuh" "src/*.cpp" "src/*.cu")
 #add_executable(cuda_test cuda_resource_test.cu
 #        include/option_parser/ConfigFileOpt.h src/option_parser/ConfigFileOpt.cpp)
 #set_target_properties(

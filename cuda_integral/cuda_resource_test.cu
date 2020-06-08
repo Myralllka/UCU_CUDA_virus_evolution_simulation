@@ -1,6 +1,5 @@
 #include <iostream>
 #include <option_parser/ConfigFileOpt.h>
-#include <math/integration_args.h>
 
 #define COEF_NUM 5
 #define gpuErrorCheck(ans); { gpuAssert((ans), __FILE__, __LINE__); }
@@ -12,21 +11,6 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort =
             exit(code);
     }
 }
-
-inline static auto get_int_args_from_conf(const ConfigFileOpt &config) {
-    return integration_args{
-            point{config.get_x().first, config.get_y().first},
-            point{config.get_x().second, config.get_y().second},
-            f_params{
-                    config.get_m(),
-                    config.get_c(),
-                    config.get_a1(),
-                    config.get_a2()
-            },
-            config.get_flow_num()
-    };
-}
-
 
 __constant__ double c[COEF_NUM], a1[COEF_NUM], a2[COEF_NUM];
 
@@ -44,8 +28,6 @@ int main(int argc, char *argv[]) {
     }
 
     //  ////////////////////////////   Integration Initiation   ////////////////////////////
-    const integration_args int_args = get_int_args_from_conf(config);
-
 
     double *d_a1;gpuErrorCheck(cudaMalloc(&d_a1, sizeof(double) * COEF_NUM))
 

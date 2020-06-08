@@ -55,7 +55,6 @@ cuda_thread_integrate(const double start_x, const double end_x, double start_y, 
     end_y = start_y + dxy * steps_per_thread;
 
     double x = start_x, y = start_y;
-    __syncthreads();
     while (y < end_y) {
         while (x < end_x) {
             for (uint8_t i = 0; i < COEF_NUM; ++i) {

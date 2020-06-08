@@ -82,6 +82,7 @@ fi; fi
 
 ###################################### Run ####################################
 if [[ "$debug_build" == true ]] || [[ "$run_debug_build" == true ]]; then
+    echo "DEBUG RUN"
     optirun ./cmake-build-debug/${exec_name} "$config_filename" || exit 1
 else
     optirun ./cmake-build-release/${exec_name} "$config_filename" || exit 1

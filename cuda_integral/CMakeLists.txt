@@ -31,13 +31,13 @@ set_target_properties(
 target_link_libraries(cuda_integral LINK_PUBLIC ${Boost_LIBRARIES})
 
 
-add_executable(cuda_resource_test cuda_resource_test.cu
-        include/option_parser/ConfigFileOpt.h src/option_parser/ConfigFileOpt.cpp)
-set_target_properties(
-        cuda_resource_test
-        PROPERTIES
-        CUDA_SEPARABLE_COMPILATION ON)
-target_link_libraries(cuda_resource_test LINK_PUBLIC ${Boost_LIBRARIES})
+#add_executable(cuda_test cuda_resource_test.cu
+#        include/option_parser/ConfigFileOpt.h src/option_parser/ConfigFileOpt.cpp)
+#set_target_properties(
+#        cuda_test
+#        PROPERTIES
+#        CUDA_SEPARABLE_COMPILATION ON)
+#target_link_libraries(cuda_test LINK_PUBLIC ${Boost_LIBRARIES})
 
 #pvs_studio_add_target(TARGET integration_mt.analyze ALL
 #        ANALYZE integration_mt

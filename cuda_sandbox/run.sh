@@ -1,4 +1,6 @@
-if [ ! -d cmake-build-debug ]
+#!/usr/bin/env bash
+
+if [[ ! -d cmake-build-debug ]]
 then
   mkdir cmake-build-debug
   cd cmake-build-debug

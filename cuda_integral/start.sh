@@ -1,6 +1,7 @@
 #!/bin/bash
 
-config_filename=../execution.conf
+exec_name="cuda_integral"
+config_filename=execution.conf
 while true; do
   case $1 in
     -c|--compile)
@@ -24,14 +25,20 @@ while true; do
       run_debug_build=true;
       shift
     ;;
+    -e|--executable)
+        exec_name=$2
+        shift 2
+        ;;
     -h|--help)
       echo "Usage: ./start.sh [options]
   Options:
     -c    --compile       Compile before executing
-    -h    --help          Show help message
     -t    --threads       Number of threads
-    -d    --debug         Debuging mode
-    -f    --file          Path to the configuration file"
+    -d    --debug         Run executable with debug symbols
+    -D    --debug-build   Build with debug
+    -f    --file          Path to the configuration file
+    -e    --executable    Executable target name"
+    -h    --help          Show help message
       exit 0;
     ;;
     \?)
@@ -53,23 +60,19 @@ if [[ ! -f "$config_filename" ]]; then
 fi
 if [[ ! -z "$threads" ]]; then
   sed -i "s/flow_num...*/flow_num = $threads/g" execution.conf;
-else
-  sed -i "s/flow_num...*/flow_num = 1/g" execution.conf;
 fi
-
-
 #################################### Build ##################################
 if [[ "$debug_build" == true ]]; then
   mkdir -p ./cmake-build-debug
-  ehco -n "Entering "
+  echo -n "Entering "
   pushd ./cmake-build-debug || exit 1
   echo Compiling...
-  cmake -lpng -DCMAKE_BUILD_TYPE=Debug -G"Unix Makefiles" .. || exit 1
+  cmake -DCMAKE_BUILD_TYPE=Debug -G"Unix Makefiles" .. || exit 1
   make || exit 1
   popd
 else if [[ "$compile" == true  ]]; then
   mkdir -p ./cmake-build-release
-  ehco -n "Entering "
+  echo -n "Entering "
   pushd ./cmake-build-release || exit 1
   echo Compiling...
   cmake -DCMAKE_BUILD_TYPE=Release -G"Unix Makefiles" .. || exit 1
@@ -77,13 +80,10 @@ else if [[ "$compile" == true  ]]; then
   popd
 fi; fi
 
-
 ###################################### Run ####################################
-if [[ "$debug_build" == true -o "$run_debug_build" == true ]]; then
-    optirun ./cmake-build-debug/mpi_heat_transfer "$config_filename" || exit 1
+if [[ "$debug_build" == true ]] || [[ "$run_debug_build" == true ]]; then
+    echo "DEBUG RUN"
+    optirun ./cmake-build-debug/${exec_name} "$config_filename" || exit 1
 else
-    optirun ./cmake-build-release/mpi_heat_transfer "$config_filename" || exit 1
+    optirun ./cmake-build-release/${exec_name} "$config_filename" || exit 1
 fi
-if [[ -z "$debug" ]]; then
-  echo "Result is: $(cat tmp/array_result | head -n 1)"
-fi;

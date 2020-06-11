@@ -4,9 +4,9 @@ start=0
 step=40000
 stop=26 # num of iters
 
-deadstart=0
+deadstart=1
 deadstep=0.05
-deadstop=10 #num of iters
+deadstop=1 #num of iters
 
 #dir="res/res0"
 #mkdir -p $dir
@@ -22,6 +22,7 @@ for deadrate in $(seq $deadstop); do
     done
     ((start += $step))
   done
+  wait
   ((deadstart += $deadstep))
   echo "waiting$deadstart..."
   start=0

@@ -2,7 +2,7 @@
 #include "file_interface/conf_parser.h"
 #include <simul_helpers.h>
 
-#define PRINT_DELAY_ITERS 1
+#define PRINT_DELAY_ITERS 1u
 #define NAMED_OUTPUT
 
 
@@ -14,33 +14,38 @@ int main(int argc, char *argv[]) {
     ConfigFileOpt config = parse_conf(argc, argv);
     srand(time(nullptr)); // set seed form random
 
-    const float tmp_probab_arr[NUMBER_OF_STATES] = {config.healthy_to_infected,
-                                                    config.infected_to_patient,
-                                                    config.patient_to_crit_patient,
-                                                    config.patient_to_dead,
-                                                    FINAL_NEXT_STATE_PROBAB,
-                                                    FINAL_NEXT_STATE_PROBAB};
-    for (size_t i = 0; i < NUMBER_OF_STATES; ++i)
+    size_t isolation_places = config.isol_place;
+    const float tmp_probab_arr[NUMBER_OF_STATES] = {config.healthy_to_infected,         // healthy
+                                                    config.infected_to_patient,         // infected
+                                                    config.patient_to_crit_patient,     // patient
+                                                    config.patient_to_dead,             // patient_crit
+                                                    FINAL_NEXT_STATE_PROBAB,            // dead
+                                                    FINAL_NEXT_STATE_PROBAB,            //
+                                                    FINAL_NEXT_STATE_PROBAB,            //
+                                                    FINAL_NEXT_STATE_PROBAB,            //
+                                                    FINAL_NEXT_STATE_PROBAB};           // immunity
+    for (size_t i = 0u; i < NUMBER_OF_STATES; ++i)
         probab_arr[i] = tmp_probab_arr[i];
 
+    ///////////////////////// INIT WORKING FIELDS //////////////////////////
     // TODO: on CUDA the field array can be already field with 0 == HEALTHY_ID
-    std::vector<uint8_t> field_data((2 + config.field_size) * (2 + config.field_size));
-    std::vector<uint8_t> next_field_data((2 + config.field_size) * (2 + config.field_size));
+    std::vector<uint8_t> field_data((2u + config.field_size) * (2u + config.field_size));
+    std::vector<uint8_t> next_field_data((2u + config.field_size) * (2u + config.field_size));
     //  vector is initialized to 0 == HEALTHY_ID automatically
 //        for (auto &cell : field_data)
 //            cell = HEALTHY_ID;
 
     // fills with IMMUNITY_ID by default
-    fill_array_border(field_data.data(), config.field_size + 2);
-    fill_array_border(next_field_data.data(), config.field_size + 2);
+    fill_array_border(field_data.data(), config.field_size + 2u);
+    fill_array_border(next_field_data.data(), config.field_size + 2u);
 
-    ///////////////////////// INIT WORKING FIELDS //////////////////////////
-    m_matrix<uint8_t> field{config.field_size + 2, config.field_size + 2, field_data.data()};
-    m_matrix<uint8_t> next_field{config.field_size + 2, config.field_size + 2, next_field_data.data()};
+    // actual working fields
+    m_matrix<uint8_t> field{config.field_size + 2u, config.field_size + 2u, field_data.data()};
+    m_matrix<uint8_t> next_field{config.field_size + 2u, config.field_size + 2u, next_field_data.data()};
     // indicate witch field is current and witch next
     bool next = true;
     // infect first cell
-    field.get((random() % config.field_size) + 1, (random() % config.field_size) + 1) = INFECTED_ID;
+    field.get((random() % config.field_size) + 1u, (random() % config.field_size) + 1u) = INFECTED_ID;
     ///////////////////////// END INIT WORKING FIELDS //////////////////////
 
     std::cout << PRINT_DELAY_ITERS << std::endl;
@@ -48,9 +53,11 @@ int main(int argc, char *argv[]) {
     Statistics statistics{};
 
     /////////////////////////////////////////////////// MAIN LOOP  ////////////////////////////////////////////////////
-    for (size_t i = 0; i < config.num_of_eras; ++i) {
-        statistics = get_statistics(field);
-
+    for (size_t i = 0u; i < config.num_of_eras / PRINT_DELAY_ITERS; ++i) {
+        if (next)
+            statistics = get_statistics(field);
+        else
+            statistics = get_statistics(next_field);
         ///////////////////// OUTPUT OUTLAY ////////////////////
         // normal, immunity, infected, patient, isolated, dead;
 #ifdef NAMED_OUTPUT
@@ -71,14 +78,14 @@ int main(int argc, char *argv[]) {
         ///////////////////// OUTPUT OUTLAY END ////////////////
 
         //////////////////////////////////// DELAY LOOP  /////////////////////////////////////
-        for (size_t print_delay = 0; print_delay < PRINT_DELAY_ITERS; ++print_delay) {
+        for (size_t print_delay = 0u; print_delay < PRINT_DELAY_ITERS; ++print_delay) {
             if (statistics.immunity + statistics.dead == config.field_size * config.field_size)
                 // finish simulation after system stabilization
                 return 0;
             if (next)
-                change_the_era(field, next_field);
+                change_the_era(field, next_field, &isolation_places);
             else
-                change_the_era(next_field, field);
+                change_the_era(next_field, field, &isolation_places);
             next = !next;
         }
         //////////////////////////////////// DELAY LOOP END //////////////////////////////////

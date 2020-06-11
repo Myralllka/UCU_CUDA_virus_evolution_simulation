@@ -7,17 +7,11 @@
 
 #include <fstream>
 #include <string>
-
-#include <matrix/code_control.h>
+#include <code_control.h>
 
 #if defined(ERROR_MSG_ON) || defined(DEBUG)
 
 #include <iostream>
-
-#endif
-
-#if defined(ERROR_MSG_ON) || defined(DEBUG)
-
 #include <matrix/index_exception.h>
 
 #endif // DEBUG
@@ -30,106 +24,41 @@ class m_matrix {
 public:
     m_matrix() = delete;
 
-    m_matrix(size_t row, size_t col, T *data) : rows(row), cols(col), data(data) {}
-
-    explicit m_matrix(const std::string &input_filename) {
-        cols = 0, rows = 0;
-        std::ifstream in(input_filename);
-        in >> cols >> rows;
-        data = new T[rows * cols * sizeof(T)];
-        for (size_t i = 0; i < rows; ++i) {
-            for (size_t j = 0; j < cols; ++j) {
-                in >> data[i * cols + j];
-            }
-        }
-    }
-
     ~m_matrix() = default;
 
-    m_matrix(const m_matrix &matrix) = delete;
+    m_matrix(size_t row, size_t col, T *data);
 
-    m_matrix(m_matrix &&matrix) noexcept: rows(matrix.rows), cols(matrix.cols), data(matrix.data) {
-        matrix.data = nullptr;
-    }
+    explicit m_matrix(const std::string &input_filename);
 
-    m_matrix &operator=(const m_matrix &matrix) = delete;
+    m_matrix(const m_matrix<T> &matrix) = delete;
 
-    m_matrix &operator=(m_matrix &&matrix) noexcept {
-        rows = matrix.rows;
-        cols = matrix.cols;
-        data = matrix.data;
-        matrix.data = nullptr;
-        return *this;
-    }
+    m_matrix(m_matrix<T> &&matrix) noexcept;
 
-    T *get_process_data_portion(size_t process_index, size_t number_of_processes) {
-        // return pointer on the beginning of the data for the process
-        // the pointer is directly on the data portion, without any overlaps
-        auto main_work = rows / number_of_processes;
-        auto extra_work = rows % number_of_processes;
-        auto process_block_width = (process_index <= extra_work) ? main_work + 1 : main_work;
-        return &(data + (process_block_width * cols));
-    }
+    m_matrix<T> &operator=(const m_matrix<T> &matrix) = delete;
 
-    size_t get_process_data_portion_length(size_t process_index, size_t number_of_processes) {
-        auto main_work = rows / number_of_processes;
-        auto extra_work = rows % number_of_processes;
-        auto process_block_width = (process_index <= extra_work) ? main_work + 1 : main_work;
-        return cols * process_block_width;
-    }
+    m_matrix<T> &operator=(m_matrix<T> &&matrix) noexcept;
 
-#if defined(ERROR_MSG_ON) || defined(DEBUG)
+    [[nodiscard]] T *get_process_data_portion(size_t process_index, size_t number_of_processes);
 
-    void print_data() {
-        for (size_t n = 0; n < cols * rows; ++n) {
-            std::cout << data[n] << " ";
-        }
-    }
+    [[nodiscard]] size_t get_process_data_portion_length(size_t process_index, size_t number_of_processes);
 
-#endif // ERROR_MSG_ON || DEBUG
+    [[nodiscard]] size_t get_cols() const;
 
-    [[nodiscard]] size_t get_cols() const {
-        return cols;
-    }
+    [[nodiscard]] size_t get_rows() const;
 
-    [[nodiscard]] size_t get_rows() const {
-        return rows;
-    }
+    [[nodiscard]] size_t size() const;
 
-    [[nodiscard]] size_t size() const {
-        return rows * cols;
-    }
+    [[nodiscard]] T &get(size_t row, size_t col) const;
 
-    [[nodiscard]] T &get(size_t row, size_t col) const {
-#ifdef DEBUG
-        check_indexes(row, col);
-#endif // DEBUG
-        return data[row * cols + col];
-    }
+    void set(size_t row, size_t col, const T &element);
 
-    void set(size_t row, size_t col, const T &element) {
-#ifdef DEBUG
-        check_indexes(row, col);
-#endif // DEBUG
-        data[row * cols + col] = element;
-    }
-
-    void set(size_t row, size_t col, T &&element) {
-#ifdef DEBUG
-        check_indexes(row, col);
-#endif // DEBUG
-        data[row * cols + col] = std::move(element);
-    }
+    void set(size_t row, size_t col, T &&element);
 
     // ITERATOR REALISATION
+    const T *begin() const;
 
-    const T *begin() const {
-        return data;
-    }
+    const T *end() const;
 
-    const T *end() const {
-        return data + cols * rows;
-    }
 
 #ifdef DEBUG
 
@@ -139,6 +68,12 @@ public:
                 std::cout << data[m * cols + n] << " ";
             }
             std::cout << std::endl;
+        }
+    }
+
+    void print_data() {
+        for (size_t n = 0; n < cols * rows; ++n) {
+            std::cout << data[n] << " ";
         }
     }
 
@@ -159,5 +94,102 @@ private:
 
 #endif // DEBUG
 };
+
+template<typename T>
+m_matrix<T>::m_matrix(const std::string &input_filename) {
+    cols = 0, rows = 0;
+    std::ifstream in(input_filename);
+    in >> cols >> rows;
+    data = new T[rows * cols * sizeof(T)];
+    for (size_t i = 0; i < rows; ++i) {
+        for (size_t j = 0; j < cols; ++j) {
+            in >> data[i * cols + j];
+        }
+    }
+}
+
+template<typename T>
+m_matrix<T>::m_matrix(size_t row, size_t col, T *data) : rows(row), cols(col), data(data) {}
+
+template<typename T>
+m_matrix<T>::m_matrix(m_matrix &&matrix) noexcept: rows(matrix.rows), cols(matrix.cols), data(matrix.data) {
+    matrix.data = nullptr;
+}
+
+template<typename T>
+m_matrix<T> &m_matrix<T>::operator=(m_matrix &&matrix) noexcept {
+    rows = matrix.rows;
+    cols = matrix.cols;
+    data = matrix.data;
+    matrix.data = nullptr;
+    return *this;
+}
+
+template<typename T>
+T *m_matrix<T>::get_process_data_portion(size_t process_index, size_t number_of_processes) {
+    // return pointer on the beginning of the data for the process
+    // the pointer is directly on the data portion, without any overlaps
+    auto main_work = rows / number_of_processes;
+    auto extra_work = rows % number_of_processes;
+    auto process_block_width = (process_index <= extra_work) ? main_work + 1 : main_work;
+    return &(data + (process_block_width * cols));
+}
+
+template<typename T>
+size_t m_matrix<T>::get_process_data_portion_length(size_t process_index, size_t number_of_processes) {
+    auto main_work = rows / number_of_processes;
+    auto extra_work = rows % number_of_processes;
+    auto process_block_width = (process_index <= extra_work) ? main_work + 1 : main_work;
+    return cols * process_block_width;
+}
+
+template<typename T>
+size_t m_matrix<T>::get_cols() const {
+    return cols;
+}
+
+template<typename T>
+size_t m_matrix<T>::get_rows() const {
+    return rows;
+}
+
+template<typename T>
+size_t m_matrix<T>::size() const {
+    return rows * cols;
+}
+
+template<typename T>
+T &m_matrix<T>::get(size_t row, size_t col) const {
+#ifdef DEBUG
+    check_indexes(row, col);
+#endif // DEBUG
+    return data[row * cols + col];
+}
+
+template<typename T>
+void m_matrix<T>::set(size_t row, size_t col, const T &element) {
+#ifdef DEBUG
+    check_indexes(row, col);
+#endif // DEBUG
+    data[row * cols + col] = element;
+}
+
+template<typename T>
+void m_matrix<T>::set(size_t row, size_t col, T &&element) {
+#ifdef DEBUG
+    check_indexes(row, col);
+#endif // DEBUG
+    data[row * cols + col] = std::move(element);
+}
+
+template<typename T>
+const T *m_matrix<T>::begin() const {
+    return data;
+}
+
+template<typename T>
+const T *m_matrix<T>::end() const {
+    return data + cols * rows;
+}
 
 #endif //LINEAR_CPP_SYM_M_MATRIX_H

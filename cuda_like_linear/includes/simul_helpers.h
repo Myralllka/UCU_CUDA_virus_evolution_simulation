@@ -8,25 +8,41 @@
 #include <cstddef>
 #include "matrix/m_matrix.h"
 
-#define FINAL_NEXT_STATE_PROBAB     0
-#define NUMBER_OF_STATES            6
+#define FINAL_NEXT_STATE_PROBAB     0.f
+// maximal state id + 1
+#define NUMBER_OF_STATES            9u
 
 // STATES
 //                                0000'0000
-#define HEALTHY_ID          0
+#define HEALTHY_ID          0u
 //                                0000'0001
-#define INFECTED_ID         1
+#define INFECTED_ID         1u
 //                                0000'0010
-#define PATIENT_ID          2
+#define PATIENT_ID          2u
 //                                0000'0011
-#define PATIENT_CRIT_ID     3
+#define PATIENT_CRIT_ID     3u
 //                                0000'0100
-#define DEAD_ID             4
+#define DEAD_ID             4u
 //                                0000'1000
-#define IMMUNITY_ID         8
+#define IMMUNITY_ID         8u
+// for temporary usage
+#define UNUSED_ID           5u
 
 // usage (state_id & INFECTED_CHECK_MASK) -- check if state infect healthy state
-#define INFECTED_CHECK_MASK       0000'0011
+#define INFECTED_CHECK_MASK             0b0000'0011u
+
+// usage (state_id & FINAL_STATE_CHECK_MASK) -- check if final state
+#define FINAL_STATE_CHECK_MASK          0b0000'1100u
+
+// usage (state_id & FINAL_ISOL_STATE_CHECK_MASK) -- check if final state is isolated
+#define FINAL_ISOL_STATE_CHECK_MASK     0b0001'1100u
+
+// usage (state_id | ISOLATE_MASK) -- isolate a state
+#define ISOLATE_MASK                    0b0001'0000u
+
+// usage (state_id & ISOLATE_MASK) -- get clean state id
+#define REMOVE_ISOL_MASK                0b1110'1111u
+
 
 // probabilities from one state to next
 // healthy -> infected -> patient -> patient_critical(only one era) -> dead
@@ -38,31 +54,33 @@ struct Statistics {
     size_t healthy = 0, immunity = 0, infected = 0, patient = 0, isolated = 0, dead = 0;
 };
 
+
 Statistics get_statistics(const m_matrix<uint8_t> &field);
+
+void change_the_era(const m_matrix<uint8_t> &field, m_matrix<uint8_t> &next_field, size_t *isolation_places);
+
 
 inline bool random_bool(float prob) {
     return rand() / static_cast<float>(RAND_MAX) < prob;
 }
 
-inline void infect_cell(const uint8_t &cell, uint8_t &res_cell) {
-    if (res_cell != INFECTED_ID && cell == HEALTHY_ID)
+inline void infect_cell(const uint8_t &cell, uint8_t &infect_cell) {
+    if (!(cell & ISOLATE_MASK) && (cell & INFECTED_CHECK_MASK))
         if (random_bool(probab_arr[HEALTHY_ID]))
-            res_cell = INFECTED_ID;
+            infect_cell = INFECTED_ID;
 }
-
-void change_the_era(const m_matrix<uint8_t> &field, m_matrix<uint8_t> &next_field);
 
 // fill square border with value
 inline void fill_array_border(uint8_t *arr, size_t side_size, uint8_t val = IMMUNITY_ID) {
     // upper and lover side separately to effectively use cache
-    for (size_t col = 0; col < side_size; ++col)
+    for (size_t col = 0u; col < side_size; ++col)
         arr[col] = val;
-    for (size_t row = 1; row < side_size - 1; ++row) {
+    for (size_t row = 1u; row < side_size - 1u; ++row) {
         arr[row * side_size] = val;
-        arr[row * side_size + side_size - 1] = val;
+        arr[row * side_size + side_size - 1u] = val;
     }
-    for (size_t col = 0; col < side_size; ++col)
-        arr[side_size * (side_size - 1) + col] = val;
+    for (size_t col = 0u; col < side_size; ++col)
+        arr[side_size * (side_size - 1u) + col] = val;
 }
 
 

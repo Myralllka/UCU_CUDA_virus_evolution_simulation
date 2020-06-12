@@ -1,10 +1,16 @@
-#include <matrix/m_matrix.h>
 #include "file_interface/conf_parser.h"
 #include <simul_helpers.h>
 
 #define PRINT_DELAY_ITERS 1u
 #define NAMED_OUTPUT
+#define DEBUG
 
+
+#ifdef DEBUG
+
+#include <bitset>
+
+#endif // DEBUG
 
 ConfigFileOpt parse_conf(int argc, char *argv[]);
 
@@ -17,7 +23,7 @@ int main(int argc, char *argv[]) {
     size_t isolation_places = config.isol_place;
     const float tmp_probab_arr[NUMBER_OF_STATES] = {config.healthy_to_infected,         // healthy
                                                     config.infected_to_patient,         // infected
-                                                    config.patient_to_crit_patient,     // patient
+                                                    config.patient_coefficient,         // patient
                                                     config.patient_to_dead,             // patient_crit
                                                     FINAL_NEXT_STATE_PROBAB,            // dead
                                                     FINAL_NEXT_STATE_PROBAB,            //
@@ -35,17 +41,23 @@ int main(int argc, char *argv[]) {
 //        for (auto &cell : field_data)
 //            cell = HEALTHY_ID;
 
-    // fills with IMMUNITY_ID by default
-    fill_array_border(field_data.data(), config.field_size + 2u);
-    fill_array_border(next_field_data.data(), config.field_size + 2u);
-
     // actual working fields
-    m_matrix<uint8_t> field{config.field_size + 2u, config.field_size + 2u, field_data.data()};
-    m_matrix<uint8_t> next_field{config.field_size + 2u, config.field_size + 2u, next_field_data.data()};
+    uint8_t *field = field_data.data();
+    uint8_t *next_field = next_field_data.data();
+    size_t field_side_len = config.field_size + 2u;
+
+    // fills with IMMUNITY_ID by default
+    fill_array_border(field, config.field_size + 2u);
+    fill_array_border(next_field, config.field_size + 2u);
+    // infect first cell
+    size_t first_infected_coord = coord((random() % config.field_size) + 1u,
+                                        (random() % config.field_size) + 1u,
+                                        field_side_len);
+    field[first_infected_coord] = INFECTED_ID;
+    next_field[first_infected_coord] = INFECTED_ID;
+
     // indicate witch field is current and witch next
     bool next = true;
-    // infect first cell
-    field.get((random() % config.field_size) + 1u, (random() % config.field_size) + 1u) = INFECTED_ID;
     ///////////////////////// END INIT WORKING FIELDS //////////////////////
 
     std::cout << PRINT_DELAY_ITERS << std::endl;
@@ -55,9 +67,9 @@ int main(int argc, char *argv[]) {
     /////////////////////////////////////////////////// MAIN LOOP  ////////////////////////////////////////////////////
     for (size_t i = 0u; i < config.num_of_eras / PRINT_DELAY_ITERS; ++i) {
         if (next)
-            statistics = get_statistics(field);
+            statistics = get_statistics(field, field_side_len);
         else
-            statistics = get_statistics(next_field);
+            statistics = get_statistics(next_field, field_side_len);
         ///////////////////// OUTPUT OUTLAY ////////////////////
         // normal, immunity, infected, patient, isolated, dead;
 #ifdef NAMED_OUTPUT
@@ -75,6 +87,16 @@ int main(int argc, char *argv[]) {
                   << statistics.isolated << " "
                   << statistics.dead << std::endl;
 #endif // NAMED_OUTPUT
+#ifdef DEBUG
+        for (size_t row = 1; row < field_side_len - 1; ++row) {
+            for (size_t col = 1; col < field_side_len - 1; ++col)
+                if (next)
+                    std::cout << std::bitset<8>(field[coord(row, col, field_side_len)]) << " ";
+                else
+                    std::cout << std::bitset<8>(next_field[coord(row, col, field_side_len)]) << " ";
+            std::cout << std::endl;
+        }
+#endif  // DEBUG
         ///////////////////// OUTPUT OUTLAY END ////////////////
 
         //////////////////////////////////// DELAY LOOP  /////////////////////////////////////
@@ -83,9 +105,9 @@ int main(int argc, char *argv[]) {
                 // finish simulation after system stabilization
                 return 0;
             if (next)
-                change_the_era(field, next_field, &isolation_places);
+                change_the_era(field, next_field, field_side_len, &isolation_places);
             else
-                change_the_era(next_field, field, &isolation_places);
+                change_the_era(next_field, field, field_side_len, &isolation_places);
             next = !next;
         }
         //////////////////////////////////// DELAY LOOP END //////////////////////////////////

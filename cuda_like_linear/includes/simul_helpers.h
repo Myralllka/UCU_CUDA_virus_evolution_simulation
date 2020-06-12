@@ -6,7 +6,9 @@
 #define LINEAR_CPP_SYM_SIMUL_HELPERS_H
 
 #include <cstddef>
-#include "matrix/m_matrix.h"
+#include <cinttypes>
+#include <random>
+
 
 #define FINAL_NEXT_STATE_PROBAB     0.f
 // maximal state id + 1
@@ -55,19 +57,24 @@ struct Statistics {
 };
 
 
-Statistics get_statistics(const m_matrix<uint8_t> &field);
+Statistics get_statistics(const uint8_t *field, size_t field_side_len);
 
-void change_the_era(const m_matrix<uint8_t> &field, m_matrix<uint8_t> &next_field, size_t *isolation_places);
+void change_the_era(const uint8_t *field, uint8_t *next_field, size_t field_side_len, size_t *isolation_places);
 
 
 inline bool random_bool(float prob) {
-    return rand() / static_cast<float>(RAND_MAX) < prob;
+    return static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < prob;
 }
 
 inline void infect_cell(const uint8_t &cell, uint8_t &infect_cell) {
     if (!(cell & ISOLATE_MASK) && (cell & INFECTED_CHECK_MASK))
         if (random_bool(probab_arr[HEALTHY_ID]))
             infect_cell = INFECTED_ID;
+}
+
+// coordinate in 2d square array
+inline size_t coord(const size_t &row, const size_t &col, size_t field_side_len) {
+    return field_side_len * row + col;
 }
 
 // fill square border with value

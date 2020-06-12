@@ -2,23 +2,30 @@
 #include <simul_helpers.h>
 
 #define PRINT_DELAY_ITERS 1u
-#define NAMED_OUTPUT
-#define DEBUG
+//#define NAMED_OUTPUT
+//#define DEBUG
+//#define TEST_SPEED
 
 
 #ifdef DEBUG
-
 #include <bitset>
-
 #endif // DEBUG
+
+#ifdef TEST_SPEED
+#include <speed_tester.h>
+#endif // TEST_SPEED
 
 ConfigFileOpt parse_conf(int argc, char *argv[]);
 
 float probab_arr[NUMBER_OF_STATES];
 
 int main(int argc, char *argv[]) {
+#ifdef TEST_SPEED
+    auto start = get_current_time_fenced();
+#endif // TEST_SPEED
+
     ConfigFileOpt config = parse_conf(argc, argv);
-    srand(time(nullptr)); // set seed form random
+    srand(static_cast<unsigned int>(time(nullptr))); // set seed form random
 
     size_t isolation_places = config.isol_place;
     const float tmp_probab_arr[NUMBER_OF_STATES] = {config.healthy_to_infected,         // healthy
@@ -73,20 +80,19 @@ int main(int argc, char *argv[]) {
         ///////////////////// OUTPUT OUTLAY ////////////////////
         // normal, immunity, infected, patient, isolated, dead;
 #ifdef NAMED_OUTPUT
-        std::cout << "healthy " << statistics.healthy << " "
-                  << "immunity " << statistics.immunity << " "
+        std::cout << "immunity " << statistics.immunity << " "
                   << "infected " << statistics.infected << " "
                   << "patient " << statistics.patient << " "
                   << "isolated " << statistics.isolated << " "
                   << "dead " << statistics.dead << std::endl;
 #else
-        std::cout << statistics.healthy << " "
-                  << statistics.immunity << " "
+        std::cout << statistics.immunity << " "
                   << statistics.infected << " "
                   << statistics.patient << " "
                   << statistics.isolated << " "
                   << statistics.dead << std::endl;
 #endif // NAMED_OUTPUT
+
 #ifdef DEBUG
         for (size_t row = 1; row < field_side_len - 1; ++row) {
             for (size_t col = 1; col < field_side_len - 1; ++col)
@@ -101,9 +107,15 @@ int main(int argc, char *argv[]) {
 
         //////////////////////////////////// DELAY LOOP  /////////////////////////////////////
         for (size_t print_delay = 0u; print_delay < PRINT_DELAY_ITERS; ++print_delay) {
-            if (statistics.immunity + statistics.dead == config.field_size * config.field_size)
+            if (statistics.immunity + statistics.dead == config.field_size * config.field_size) {
                 // finish simulation after system stabilization
+#ifdef TEST_SPEED
+                auto finish = get_current_time_fenced();
+                std::cout << "Total in s  :\t" << to_s(finish - start) << std::endl;
+                std::cout << "Total in ms :\t" << to_ms(finish - start) << std::endl;
+#endif // TEST_SPEED
                 return 0;
+            }
             if (next)
                 change_the_era(field, next_field, field_side_len, &isolation_places);
             else
@@ -113,6 +125,11 @@ int main(int argc, char *argv[]) {
         //////////////////////////////////// DELAY LOOP END //////////////////////////////////
     }
     /////////////////////////////////////////////////// MAIN LOOP END /////////////////////////////////////////////////
+#ifdef TEST_SPEED
+    auto finish = get_current_time_fenced();
+    std::cout << "Total in s  :\t" << to_s(finish - start) << std::endl;
+    std::cout << "Total in ms :\t" << to_ms(finish - start) << std::endl;
+#endif // TEST_SPEED
     return 0;
 }
 

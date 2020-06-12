@@ -22,7 +22,6 @@ public:
 
     float healthy_to_infected = .0f;
     float infected_to_patient = .0f;
-    float patient_to_crit_patient = 1.f;
     float patient_to_dead = .0f;
     float patient_coefficient = .0f;
 

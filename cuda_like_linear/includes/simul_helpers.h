@@ -36,9 +36,6 @@
 // usage (state_id & FINAL_STATE_CHECK_MASK) -- check if final state
 #define FINAL_STATE_CHECK_MASK          0b0000'1100u
 
-// usage (state_id & FINAL_ISOL_STATE_CHECK_MASK) -- check if final state is isolated
-#define FINAL_ISOL_STATE_CHECK_MASK     0b0001'1100u
-
 // usage (state_id | ISOLATE_MASK) -- isolate a state
 #define ISOLATE_MASK                    0b0001'0000u
 

@@ -67,28 +67,4 @@ cuda_thread_integrate(const double start_x, const double end_x, double start_y, 
         y += dxy;
     }
     res[threadIdx.x] = -l_res * dxy * dxy;
-
-//    __shared__ double local_res[MAX_THREAD_NUM], tmp_res[MAX_THREAD_NUM], tmp_diag[MAX_THREAD_NUM]; // local result
-    /*
-    double x;
-    start_y = start_y + dxy * steps * threadIdx.x;
-    end_y = start_y + dxy * steps * (threadIdx.x + 1);
-
-    while (start_y < end_y) {
-        x = start_x;
-        while (x < end_x) {
-            ////////////////////////// Langerman Function inline //////////////////////////
-            tmp_res[threadIdx.x] = 0.0;
-            for (unsigned long int i = 0; i < COEF_NUM; ++i) {
-                tmp_diag[threadIdx.x] = (x - a1[i]) * (x - a1[i]) + (start_y - a2[i]) * (start_y - a2[i]);
-                tmp_res[threadIdx.x] += c[i] * exp(-1 / M_PI * tmp_diag[threadIdx.x]) * cos(M_PI * tmp_diag[threadIdx.x]);
-            }
-            ///////////////////////////////////////////////////////////////////////////////
-            local_res[threadIdx.x] -= tmp_res[threadIdx.x];
-            x += dxy;
-        }
-        start_y += dxy;
-    }
-    res[threadIdx.x] = local_res[threadIdx.x] * dxy * dxy;
-     */
 }

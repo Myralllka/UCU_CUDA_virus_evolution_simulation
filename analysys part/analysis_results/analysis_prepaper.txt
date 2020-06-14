@@ -1,0 +1,49 @@
+
+
+
+
+
+Death rate = 5% 	15% = Maximum profit of survival with beds increase
+Death rate = 10% 	11% = Maximum profit of survival with beds increase
+Death rate = 15% 	9% = Maximum profit of survival with beds increase
+Death rate = 20% 	13% = Maximum profit of survival with beds increase
+Death rate = 25% 	21% = Maximum profit of survival with beds increase
+Death rate = 30% 	24% = Maximum profit of survival with beds increase
+Death rate = 35% 	21% = Maximum profit of survival with beds increase
+Death rate = 40% 	13% = Maximum profit of survival with beds increase
+Death rate = 45% 	20% = Maximum profit of survival with beds increase
+Death rate = 50% 	21% = Maximum profit of survival with beds increase
+Death rate = 55% 	29% = Maximum profit of survival with beds increase
+Death rate = 60% 	17% = Maximum profit of survival with beds increase
+Death rate = 65% 	21% = Maximum profit of survival with beds increase
+Death rate = 70% 	27% = Maximum profit of survival with beds increase
+Death rate = 75% 	14% = Maximum profit of survival with beds increase
+Death rate = 80% 	20% = Maximum profit of survival with beds increase
+Death rate = 85% 	12% = Maximum profit of survival with beds increase
+Death rate = 90% 	18% = Maximum profit of survival with beds increase
+Death rate = 95% 	17% = Maximum profit of survival with beds increase
+Death rate = 100% 	17% = Maximum profit of survival with beds increase
+
+
+
+Death rate = 5% 	4% = Mean profit of survival with beds increase
+Death rate = 10% 	4% = Mean profit of survival with beds increase
+Death rate = 15% 	3% = Mean profit of survival with beds increase
+Death rate = 20% 	3% = Mean profit of survival with beds increase
+Death rate = 25% 	6% = Mean profit of survival with beds increase
+Death rate = 30% 	3% = Mean profit of survival with beds increase
+Death rate = 35% 	6% = Mean profit of survival with beds increase
+Death rate = 40% 	4% = Mean profit of survival with beds increase
+Death rate = 45% 	3% = Mean profit of survival with beds increase
+Death rate = 50% 	5% = Mean profit of survival with beds increase
+Death rate = 55% 	4% = Mean profit of survival with beds increase
+Death rate = 60% 	4% = Mean profit of survival with beds increase
+Death rate = 65% 	6% = Mean profit of survival with beds increase
+Death rate = 70% 	10% = Mean profit of survival with beds increase
+Death rate = 75% 	3% = Mean profit of survival with beds increase
+Death rate = 80% 	4% = Mean profit of survival with beds increase
+Death rate = 85% 	2% = Mean profit of survival with beds increase
+Death rate = 90% 	3% = Mean profit of survival with beds increase
+Death rate = 95% 	3% = Mean profit of survival with beds increase
+Death rate = 100% 	3% = Mean profit of survival with beds increase
+

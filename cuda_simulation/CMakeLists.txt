@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 ## PVS Studio
 # include(PVS-Studio.cmake)
 # SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+set(CMAKE_BUILD_TYPE DEBUG)
 if (CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif ()
@@ -28,7 +28,6 @@ set_target_properties(
 target_link_libraries(cuda_simulation LINK_PUBLIC ${Boost_LIBRARIES})
 
 
-file(GLOB_RECURSE SRC "include/*.h" "include/*.cuh" "src/*.cpp" "src/*.cu")
 add_executable(cuda_test cuda_test.cu
         includes/file_interface/parser_exception.h
         includes/file_interface/conf_parser.h src/file_interface/conf_parser.cpp)

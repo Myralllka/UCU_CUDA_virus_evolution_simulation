@@ -7,8 +7,7 @@
 
 #include <cstddef>
 #include <cinttypes>
-#include <random>
-
+#include <curand_kernel.h>
 
 #define FINAL_NEXT_STATE_PROBAB     0.f
 // maximal state id + 1
@@ -43,39 +42,55 @@
 #define REMOVE_ISOL_MASK                0b1110'1111u
 
 
-// probabilities from one state to next
-// healthy -> infected -> patient -> patient_critical(only one era) -> dead
-//                                                                  -> immunity
-extern float probab_arr[NUMBER_OF_STATES];
-
-
 struct Statistics {
     size_t healthy = 0, immunity = 0, infected = 0, patient = 0, isolated = 0, dead = 0;
 };
 
 
-Statistics get_statistics(const uint8_t *field, size_t field_side_len);
-
-void change_the_era(const uint8_t *field, uint8_t *next_field, size_t field_side_len, size_t *isolation_places);
-
-
-inline bool random_bool(float prob) {
-    return static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < prob;
+__device__ inline bool random_bool(float prob, curandState_t *state_p) {
+    return static_cast<float>(curand(state_p)) / static_cast<float>(RAND_MAX) < prob;
 }
 
-inline void infect_cell(const uint8_t &cell, uint8_t &infect_cell) {
+__device__ inline void
+infect_cell(const uint8_t &cell, uint8_t &infect_cell, const float *probab_arr, curandState_t *state_p) {
     if (!(cell & ISOLATE_MASK) && (cell & INFECTED_CHECK_MASK))
-        if (random_bool(probab_arr[HEALTHY_ID]))
+        if (random_bool(probab_arr[HEALTHY_ID], state_p))
             infect_cell = INFECTED_ID;
 }
 
 // coordinate in 2d square array
-inline size_t coord(const size_t &row, const size_t &col, size_t field_side_len) {
+__device__ __forceinline__ size_t coord(const size_t &row, const size_t &col, size_t field_side_len) {
     return field_side_len * row + col;
 }
 
+
+__device__ inline Statistics get_statistics(const uint8_t *field, size_t field_side_len) {
+    size_t res[NUMBER_OF_STATES]; // UNUSED_ID index is used for isolated count
+    for (auto &re : res)
+        re = 0u;
+
+    uint8_t tmp_cell;
+    for (size_t row = 1u; row < field_side_len - 1u; ++row)
+        for (size_t col = 1u; col < field_side_len - 1u; ++col) {
+            tmp_cell = field[coord(row, col, field_side_len)];
+//          if (   is_isolated         )
+            if (tmp_cell & ISOLATE_MASK)
+                ++res[UNUSED_ID];
+            else
+                ++res[tmp_cell];
+        }
+
+    return Statistics{res[HEALTHY_ID],
+                      res[IMMUNITY_ID],
+                      res[INFECTED_ID] + res[PATIENT_ID] + res[PATIENT_CRIT_ID],
+                      res[PATIENT_ID] + res[PATIENT_CRIT_ID] + res[UNUSED_ID],
+                      res[UNUSED_ID],
+                      res[DEAD_ID]
+    };
+}
+
 // fill square border with value
-inline void fill_array_border(uint8_t *arr, size_t side_size, uint8_t val = IMMUNITY_ID) {
+__device__ inline void fill_array_border(uint8_t *arr, size_t side_size, uint8_t val = IMMUNITY_ID) {
     // upper and lover side separately to effectively use cache
     for (size_t col = 0u; col < side_size; ++col)
         arr[col] = val;

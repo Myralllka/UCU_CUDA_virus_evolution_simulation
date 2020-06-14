@@ -47,7 +47,7 @@ void change_the_era(const uint8_t *field, uint8_t *next_field, size_t field_side
                 continue;
             }
             ///////////////////////////  ISOLATE IF POSSIBLE  ///////////////////////////
-            if (cell_st_id & ISOLATE_MASK)
+            if (!(cell_st_id & ISOLATE_MASK))
                 if (cell_st_id == PATIENT_ID)
                     if (*isolation_places) {
                         --(*isolation_places);

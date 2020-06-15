@@ -11,6 +11,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif ()
 
+set(CMAKE_BUILD_TYPE Release)
 #set(Boost_USE_STATIC_LIBS OFF) # enable dynamic linking
 find_package(Boost COMPONENTS filesystem program_options REQUIRED)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})

@@ -1,0 +1,95 @@
+КОРОТКИЙ ПЛАН
+
+1.Вступ
+2. Задача + наша мета
+3. Як вирішуємо (опис моделі [3.1 SEIR як приклад, 3.2 наша модель, 3.3 коефіцієнти якими впливаємо] + опис CUDA [3.4 що таке CUDA, 3.5 який алгоритм розпаралелення])
+4. Результати (4.1 прискорення CUDA vs C++, аналіз графіків)
+5. Висмновки (що планували? що зробили? які були проблеми? які розвитки)
+
+---------------------------------------------------
+ЩО ВАМ ЧЕКАТИ ЗАВТРА ВІД МЕНЕ
+
+Що має зробити Аня 14.06
+ : 1) нарисовать новую модель
+   2) анализ графиков
+	- gif death rate
+	- phase death rate
+	- little phase for 2 beds
+	- phase integral
+
+
+----------------------------------------------------
+ШИРШИЙ ПЛАН
+
+1. Микола - раздолье твоє.
+
+2. Задача: Create virus epidemy simulation using CUDA API and test hypothesis.
+   Мета (ширше дослідження): дослідити залежність між кількістю ізоляційних місць та швидкістю зростання смертей, визначити найвдалішу кількість ізоляційних місць для певного коефіцієнту смертності (тут це мається на увазі, що ми можемо дати якусь пораду)
+
+3. - Слайд з SEIR моделлю (як раніше, але без нашої схеми)
+   - Наша модель (схема, коротко описати стани і переходи, перелічити коефіцієнти на які впливаємо, а на які ні (чому обрали їх)
+   - Що таке CUDA (ємко в 1 слайді)
+   - Алгоритм реалізації (тут можна навіть класно вставити щось з того, що малював Юра на листочку)
+
+4. - Результаті по CUDA (порівняти швидкість запусків і вказати на яких параметрах вони були зроблені)
+   - Аналіз графіків (АНЯ)
+
+5. Висновки (що планували? що зробили? які були проблеми? які розвитки)
+
+-------------------------------------------------
+МОЯ ЧАСТИНА
+
+====================================================================================
+
++++ Gif Death Rate +++ (iterate_dead_rate_per_steps_of_beds.gif)
+
+
+На графіку: Кожен кадр - +5% до death rate. Кожна лінія - 0, 40'000, 80'000 ... 1'000'000 місць ізоляції.
+
+1) Зі зростанням death_rate зростає impact збільшення ліжок (це може бути помітним через рознос, ширину)
+2) Зміна кількості ліжок здебільшого починає впливати на 200 епосі - а саме сповільнювати смертність.
+3) Найбільше сповільнення спостерігається в околі 800 епохи, що буде перевірено у дослідженнях далі (тобто це наша гіпотеза, і ми її чекнемо)
+
+======================================================================================
+
++++ Phase death diagram +++ (dead_beds_profit_rate.png, dead_beds_best_profit_rate.png)
+
+
+Мета графіку: виміряти кінцевий profit у кількості померлих від збільшення ліжок.
+Чи є певна закономірність у зменшенні смертності (очікуємо побачити чітку класифікацію на три групи).
+
+Як вимірюємо?
+1 - Вимірюється кількість смертей на останній епосі (остання епоха - та, після якої не відбуваються зміни статистик) для n-кількості ізоляційних місць і k-death_rate
+2 - Для k-death_rate вимірюється максимум і мінімум зі всіх кількосией смертей.(one_shot_example_death_rate35.png або one_shot_example.png - на цьому прикладі сказати про точки, які в кінці зійдуться і сам той відрізок)
+3 - Відносно цього max і min смертей - вся область смертності розбивається на 3 групи: низька смертність, середня, висока.
+4 - Кожна комбінація [кількість ізоляційних місць] x [death rate] має свою кількість смертей, яку класифікуємо за попереднім описом.
+
+
+1) Графік не показав закономірності, скоріше спростував її наявність - тобто кінцева кількість смертей за епідемію не строго залежить від кількості і.м.
+
+=====================================================================================
+ 
++++ "Cause previous plot rejected one of our hypothesis, we decided to dig deepper - create phase plot for integrals between beds to find the place of best difference between 2 amounts of beds for each case" +++
+
+Як вимірюємо?
+1 - Start from counting the maximum difference in deaths between 2 amounts of beds for the same death rate (integral_example.png, тут можна показати цю область яку інтегруємо між двома лініями)
+2 - This operation we count for each death rate. Now it is possible to build the next plots (40000_80000_max_difference.png, 40000_400000_max_difference.png). 
+
+This plot can show us the point of the maximum slowness in time in deaths amount  to which the simulation is going to with respect to the next amount of beds. (Like how the quarantine really works)
+
+1) Hypothesis that the maximum difference is near the 800 epoch was confirmed.
+2) The larger the death rate is - closer the epoch of max difference to the center of spreading and bigger is the difference.
+3) There is still some points out of the main pattern of spreading.
+4) Bigger the difference of isolation places numbers - bigger the slowness of deaths per epoch before the max point.
+
+=====================================================================================
+
++++ Phase Integral +++ 
+
+Here we not just counting the maximum difference, but the integral between each two interpretations of simulations, to achive the most accurate result of slowness(тут можна показати той самий графік) for each combination of [death rate] x [isolation places]
+
+(phase_integral_diagram2)
+
+This plot can show us the best [переходи] between beds amount which gives the biggest impact in death slowness for different death rates. Actually, from this analysis part we can derive some advices about which amount of "beds" will give the best impact for each case.
+
+

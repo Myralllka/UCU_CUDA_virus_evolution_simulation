@@ -2,7 +2,7 @@
 from sys import argv
 import matplotlib.pyplot as plt
 import statistics
-from test_plot_phase import create_plot
+from test_plot_phase import create_plot, test_phase_difference, test_phase_integral
 import numpy
 
 
@@ -58,6 +58,7 @@ def plot_one_iter(iter_steps, snapshot_num, people_num, all_dict):
     plt.legend()
     plt.ylabel("% of dead people")
     plt.savefig('./plots/foo{}.png'.format(near_res_count - 5))
+    plt.title("5% of death rate / 40'000 and 80'000 beds ")
     plt.show()
 
 
@@ -72,7 +73,6 @@ def preprocessing_before_plot_one_iter(all_dict):
 
 
 def preprocessing_before_phase_plot(all_dict, profit=True):
-
     if profit:
         min_death = min(all_dict[key][-1] for key in all_dict)
         print("MIN DEATH", min_death)
@@ -127,8 +127,46 @@ def find_survival_profit(dead_rate_dict):
           "\t{}% = Maximum profit of survival with beds increase".format(int(100 - percent_from_all_death)))
 
 
+def preprocessing_before_phase_differences(all_dict, start_isolation_places, finish_isolation_places):
+    start_arr = all_dict['beds_{}'.format(finish_isolation_places)]
+    finish_arr = all_dict['beds_{}'.format(start_isolation_places)]
+    print('beds_{}'.format(finish_isolation_places))
+    min_length = min(len(start_arr), len(finish_arr))
+    print(min_length)
+
+    # print(start_arr[1730])
+    # print(finish_arr[1730])
+    max_diff = [0, 0]  # difference, epoch
+    for epoch in range(min_length):
+        dif = abs(finish_arr[epoch] - start_arr[epoch])
+        if dif > max_diff[0]:
+            max_diff = [dif, epoch]
+
+    return max_diff
+
+def count_integral(low_arr, high_arr):
+
+    result_integral = 0
+
+    smallest_length = min(len(low_arr), len(high_arr))
+    for epoch in range(smallest_length):
+        epoch_distance = abs(high_arr[epoch] - low_arr[epoch])
+        result_integral += epoch_distance
+
+    return result_integral
+
+
+
 if __name__ == '__main__':
     near_res_count = 5
+
+    epoch_diff_list = [[], [], []]  # [epoch],[difference],[death_rate]
+    experiment_death_phase = [[], [], []] # [isolation places],[death rate], [death amount]
+    beds_to_differ_1 = 40000
+    beds_to_differ_2 = 80000
+
+    epoch_integral = [[], [], []] # xyz = [death rate],[isolation places],[integral]
+
 
     phase_plot_dict = dict()
     # green - low level
@@ -141,7 +179,7 @@ if __name__ == '__main__':
         phase_plot_dict[i] = [[], []]
 
     # 20
-    for i in range(1):
+    for i in range(19):
         # 0
         near_res_bed_count = 0
         f_dir = "../RES/res{}/".format(near_res_count)
@@ -157,18 +195,46 @@ if __name__ == '__main__':
             iter_step, people_num, immunity_a, infected_a, patient_a, isolated_a, dead_a = parse_file(f_name)
 
             dead_rate_n_beds['beds_{}'.format(near_res_bed_count)] = dead_a  # param to visualise
+
+            # integral phase diagram -----------------------------------------------------------------
+
+            if j > 1:
+                integral = count_integral(dead_rate_n_beds['beds_{}'.format(near_res_bed_count - 40000)],
+                                          dead_rate_n_beds['beds_{}'.format(near_res_bed_count)])
+
+                epoch_integral[0].append(near_res_count - 5)
+                epoch_integral[1].append(near_res_bed_count)
+                epoch_integral[2].append(integral)
+
+            # -----------------------------------------------------------------------------------------
+
             near_res_bed_count += 40000
 
-        # plot the graph ########################################
-        temp_tuple = preprocessing_before_plot_one_iter(dead_rate_n_beds)
-        plot_one_iter(iter_step, temp_tuple[1], people_num, temp_tuple[0])
 
-        # find profit ###########################################
+        # plot the graph -----------------------------------------------------------------
+        # temp_tuple = preprocessing_before_plot_one_iter(dead_rate_n_beds)
+        # plot_one_iter(iter_step, temp_tuple[1], people_num, temp_tuple[0])
+
+        # find profit --------------------------------------------------------------------
         # find_survival_profit(dead_rate_n_beds)
 
-        # statistics per one run of death_coef ##################
+        # statistics per one run of death_coef -------------------------------------------
         # preprocessing_before_phase_plot(dead_rate_n_beds)
+
+        # phase diagram for max diffetrence ----------------------------------------------
+        # data = preprocessing_before_phase_differences(dead_rate_n_beds, beds_to_differ_1, beds_to_differ_2)  # return [difference, epoch]
+        # epoch_diff_list[0].append(data[1])  # x
+        # epoch_diff_list[1].append(data[0])  # y
+        # epoch_diff_list[2].append(near_res_count - 5)  # z
+
+    # print(epoch_diff_list)
+    # test_phase_difference(epoch_diff_list, beds_to_differ_1, beds_to_differ_2)
+
+
+
+    test_phase_integral(epoch_integral)
+
 
     # create_plot(phase_plot_dict)
 
-        # break
+    # break

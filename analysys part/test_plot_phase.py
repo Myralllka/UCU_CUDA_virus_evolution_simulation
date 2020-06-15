@@ -25,5 +25,36 @@ def create_plot(dicttt):
     plt.savefig('./analysis_results/immunity_beds_best_profit_rate.png')
     plt.show()
 
+
+def test_phase_difference(xyz, beds_1, beds_2):
+    # xyz = np.array(np.random.random((3, 3)))
+    # print(xyz)
+    # print(xyz[:, 0])
+    marker_size = 30
+    plt.scatter(xyz[0], xyz[1], marker_size, c=xyz[2])
+    plt.title("{} vs {} beds".format(beds_1, beds_2))
+    plt.xlabel("Epoch")
+    plt.ylabel("Max difference")
+    cbar = plt.colorbar()
+    plt.grid(True)
+    cbar.set_label("death_rate", labelpad=+1)
+    plt.show()
+
+
+def test_phase_integral(xyz):
+    # xyz = np.array(np.random.random((3, 3)))
+    # print(xyz)
+    # print(xyz[:, 0])
+    marker_size = 2000
+    plt.scatter(xyz[0], xyz[1], marker_size, c=xyz[2], marker="s")
+    plt.title("Integrals between isolation places")
+    plt.xlabel("% Death rate")
+    plt.ylabel("% Isolation places")
+    cbar = plt.colorbar()
+    plt.grid(True)
+    cbar.set_label("Integral size", labelpad=+1)
+    plt.show()
+
 if __name__ == '__main__':
-    create_plot()
+    # create_plot()
+    test_phase_difference('a')

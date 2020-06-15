@@ -133,20 +133,41 @@ void cuda_simulation(const ConfigFileOpt &config) {
                                                   &isolation_places, d_rand_gen_arr, d_res_stats);
 
         //////////////////////////////////// PRINT FIELD //////////////////////////////////////////
-//        std::vector<uint8_t> v(field_side_len * field_side_len);
-//        uint8_t *h_field = v.data();
-//        if (next)
-//            gpuErrorCheck(cudaMemcpy(h_field, d_field,
-//                                     field_side_len * field_side_len * sizeof(uint8_t), cudaMemcpyDeviceToHost))//
-//        else
-//            gpuErrorCheck(cudaMemcpy(h_field, d_next_field,
-//                                     field_side_len * field_side_len * sizeof(uint8_t), cudaMemcpyDeviceToHost))//
+        std::vector<uint8_t> v(field_side_len * field_side_len);
+        uint8_t *h_field = v.data();
+        if (next) { gpuErrorCheck(cudaMemcpy(h_field, d_field, field_side_len * field_side_len * sizeof(uint8_t),
+                                             cudaMemcpyDeviceToHost))
+        } else gpuErrorCheck(cudaMemcpy(h_field, d_next_field,
+                                        field_side_len * field_side_len * sizeof(uint8_t),
+                                        cudaMemcpyDeviceToHost));
 
-//        for (size_t row = 0; row < field_side_len; ++row) {
-//            for (size_t col = 0; col < field_side_len; ++col)
+        for (size_t row = 0; row < field_side_len; ++row) {
+            for (size_t col = 0; col < field_side_len; ++col)
+                switch (h_field[row * field_side_len + col]) {
+                    case HEALTHY_ID:
+                        std::cout << "." << " ";
+                        continue;
+                    case INFECTED_ID:
+                        std::cout << "*" << " ";
+                        continue;
+                    case PATIENT_ID:
+                        std::cout << "p" << " ";
+                        continue;
+                    case DEAD_ID:
+                        std::cout << "d" << " ";
+                        continue;
+                    case IMMUNITY_ID:
+                        std::cout << "i" << " ";
+                        continue;
+                    default:
+                        std::cout << "?" << " ";
+                        continue;
+                }
+
+
 //                std::cout << std::bitset<8>(h_field[row * field_side_len + col]) << " ";
-//            std::cout << std::endl;
-//        }
+            std::cout << std::endl;
+        }
         //////////////////////////////////// PRINT FIELD  END /////////////////////////////////////
 
         next = !next;

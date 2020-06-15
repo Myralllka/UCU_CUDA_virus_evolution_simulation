@@ -1,7 +1,7 @@
 #include "file_interface/conf_parser.h"
 #include <cuda_simulation.cuh>
 
-//#define TEST_SPEED
+#define TEST_SPEED
 
 #ifdef TEST_SPEED
 #include <speed_tester.h>

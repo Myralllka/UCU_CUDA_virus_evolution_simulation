@@ -4,7 +4,7 @@
 #define PRINT_DELAY_ITERS 1u
 //#define NAMED_OUTPUT
 //#define DEBUG
-//#define TEST_SPEED
+#define TEST_SPEED
 
 
 #ifdef DEBUG
@@ -86,11 +86,11 @@ int main(int argc, char *argv[]) {
                   << "isolated " << statistics.isolated << " "
                   << "dead " << statistics.dead << std::endl;
 #else
-        std::cout << statistics.immunity << " "
-                  << statistics.infected << " "
-                  << statistics.patient << " "
-                  << statistics.isolated << " "
-                  << statistics.dead << std::endl;
+//        std::cout << statistics.immunity << " "
+//                  << statistics.infected << " "
+//                  << statistics.patient << " "
+//                  << statistics.isolated << " "
+//                  << statistics.dead << std::endl;
 #endif // NAMED_OUTPUT
 
 #ifdef DEBUG

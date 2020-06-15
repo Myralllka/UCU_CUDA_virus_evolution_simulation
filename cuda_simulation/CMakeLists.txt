@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 ## PVS Studio
 # include(PVS-Studio.cmake)
 # SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_BUILD_TYPE DEBUG)
+
 if (CMAKE_COMPILER_IS_GNUCC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 endif ()

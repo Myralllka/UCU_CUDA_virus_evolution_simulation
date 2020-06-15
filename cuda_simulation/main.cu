@@ -7,6 +7,7 @@
 #include <speed_tester.h>
 #endif // TEST_SPEED
 
+
 ConfigFileOpt parse_conf(int argc, char *argv[]);
 
 

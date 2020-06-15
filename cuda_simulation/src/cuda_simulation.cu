@@ -17,20 +17,13 @@
 #endif // DEBUG
 
 
-__global__ void statistics_test(Statistics *d_res_stats) {
-    *d_res_stats = Statistics{555, 5555555555, 55, 5, 5, 5};
-}
-
-
 __global__ void
 init_working_set(uint8_t *d_field, uint8_t *d_next_field, size_t field_side_len, curandState_t *d_rand_gen_arr,
                  size_t *d_isolation_places_arr, size_t isol_place, Statistics *d_res_stats) {
-    // CUDA's random number library uses curandState_t to keep track of the seed value we will store
-    // a random state for every thread
     curandState_t state;
-    curand_init(clock64() - 1u,         /* the seed controls the sequence of random values that are produced */
-                0, /* the sequence number is only important with multiple cores */
-                0,      /* the offset is how much extra we advance in the sequence for each call, can be 0 */
+    curand_init(clock64() - 1u, /* the seed controls the sequence of random values that are produced */
+                0,        /* the sequence number is only important with multiple cores */
+                0,             /* the offset is how much extra we advance in the sequence for each call, can be 0 */
                 &state);
 
 //     fills with IMMUNITY_ID by default
@@ -45,28 +38,27 @@ init_working_set(uint8_t *d_field, uint8_t *d_next_field, size_t field_side_len,
 
     // init random generator for each thread
     for (size_t offset = 0; offset <= THREADS; ++offset)
-        curand_init(clock64(),         /* the seed controls the sequence of random values that are produced */
-                    offset, /* the sequence number is only important with multiple cores */
-                    0u,      /* the offset is how much extra we advance in the sequence for each call, can be 0 */
+        curand_init(clock64(),
+                    offset,
+                    0u,
                     &d_rand_gen_arr[offset]);
 
     // distribute isol places for each thread
     // TODO: check if isol_place is decidable by THREADS
-    const size_t isol_place_per_thread = isol_place / THREADS;
+    const size_t isol_place_per_thread = isol_place / (THREADS * THREADS / 4);
     for (size_t i = 0; i < THREADS; ++i)
         d_isolation_places_arr[i] = isol_place_per_thread;
 
-    // init statistics
     *d_res_stats = Statistics{};
 }
 
-void cuda_simulation(ConfigFileOpt config) {
+void cuda_simulation(const ConfigFileOpt &config) {
     size_t isolation_places = config.isol_place;
     const size_t field_side_len = config.field_size + 2u;
 
 //  probabilities from one state to next state
 //  healthy -> infected -> patient -> patient_critical(only one era) -> dead
-//                                                                  -> immunity
+//                                                                   -> immunity
     // TODO: load into CUDA_CONST_MEMORY
     const float probab_arr[NUMBER_OF_STATES] = {config.healthy_to_infected,         // healthy
                                                 config.infected_to_patient,         // infected
@@ -105,16 +97,9 @@ void cuda_simulation(ConfigFileOpt config) {
     // indicate witch d_field is current and witch next
     bool next = true;
 
-#ifdef DEBUG
-    std::vector<uint8_t> tmp_v(field_side_len * field_side_len);
-    uint8_t *tmp_field = tmp_v.data();
-//    Statistics tmp_s{};
-//    float prob[NUMBER_OF_STATES];
-#endif // DEBUG
+    for (size_t i = 0u; i < config.num_of_eras / PRINT_DELAY_ITERS; ++i) {//
+        gpuErrorCheck(cudaMemcpy(&res_stats, d_res_stats, sizeof(Statistics), cudaMemcpyDeviceToHost))//
 
-    for (size_t i = 0u; i < config.num_of_eras / PRINT_DELAY_ITERS; ++i) { gpuErrorCheck(
-                cudaMemcpy(&res_stats, d_res_stats, sizeof(Statistics), cudaMemcpyDeviceToHost))//
-        // TODO: statistics calculation
         ///////////////////// OUTPUT OUTLAY ////////////////////
         // normal, immunity, infected, patient, isolated, dead;
 #ifdef NAMED_OUTPUT
@@ -140,9 +125,6 @@ void cuda_simulation(ConfigFileOpt config) {
         //////////////////////////////////// DELAY LOOP  /////////////////////////////////////
         // TODO: assert thread divisible by 2
         dim3 worker_space(THREADS / 2u, THREADS / 2u);
-//        dim3 worker_space(1, 1);
-//        dim3 worker_space(32, 32);
-//        for (size_t print_delay = 0u; print_delay < PRINT_DELAY_ITERS; ++print_delay) {
         if (next)
             sim_block_worker<<<1, worker_space>>>(d_field, d_next_field, field_side_len, d_probab_arr,
                                                   &isolation_places, d_rand_gen_arr, d_res_stats);
@@ -150,30 +132,28 @@ void cuda_simulation(ConfigFileOpt config) {
             sim_block_worker<<<1, worker_space>>>(d_next_field, d_field, field_side_len, d_probab_arr,
                                                   &isolation_places, d_rand_gen_arr, d_res_stats);
 
-
-        std::vector<uint8_t> v(field_side_len * field_side_len);
-        uint8_t *h_field = v.data();
-
-//        if (next) {
+        //////////////////////////////////// PRINT FIELD //////////////////////////////////////////
+//        std::vector<uint8_t> v(field_side_len * field_side_len);
+//        uint8_t *h_field = v.data();
+//        if (next)
 //            gpuErrorCheck(cudaMemcpy(h_field, d_field,
 //                                     field_side_len * field_side_len * sizeof(uint8_t), cudaMemcpyDeviceToHost))//
-//        } else {
+//        else
 //            gpuErrorCheck(cudaMemcpy(h_field, d_next_field,
 //                                     field_side_len * field_side_len * sizeof(uint8_t), cudaMemcpyDeviceToHost))//
-//        }
-
 
 //        for (size_t row = 0; row < field_side_len; ++row) {
 //            for (size_t col = 0; col < field_side_len; ++col)
 //                std::cout << std::bitset<8>(h_field[row * field_side_len + col]) << " ";
 //            std::cout << std::endl;
 //        }
-//
+        //////////////////////////////////// PRINT FIELD  END /////////////////////////////////////
+
         next = !next;
-//        }
         //////////////////////////////////// DELAY LOOP END //////////////////////////////////
-    }gpuErrorCheck(cudaMemcpy(&res_stats, d_res_stats, sizeof(Statistics), cudaMemcpyDeviceToHost))//
-    // TODO: statistics calculation
+    }
+
+    gpuErrorCheck(cudaMemcpy(&res_stats, d_res_stats, sizeof(Statistics), cudaMemcpyDeviceToHost))//
     ///////////////////// OUTPUT OUTLAY ////////////////////
     // normal, immunity, infected, patient, isolated, dead;
 #ifdef NAMED_OUTPUT
@@ -198,32 +178,26 @@ void cuda_simulation(ConfigFileOpt config) {
     gpuErrorCheck(cudaFree(d_field))//
 }
 
-__global__ void sim_block_worker(uint8_t *d_field, uint8_t *d_next_field, size_t field_side_len,
-                                 const float *probab_arr, size_t *isolation_places, curandState_t *d_rand_gen_arr,
+__global__ void sim_block_worker(const uint8_t *d_field, uint8_t *d_next_field, size_t field_side_len,
+                                 const float *probab_arr, size_t *d_isolation_places_arr, curandState_t *d_rand_gen_arr,
                                  Statistics *d_res_stats) {
     // TODO: assert that field_side_len / blockDim.x is fully dividable
     const size_t working_set_side = (field_side_len - 2u) / blockDim.x;
     const uint thread_id = threadIdx.x + blockDim.x * threadIdx.y;
 
-    __shared__ size_t stats_arr[
-            (THREADS / 2) * (THREADS / 2) * NUMBER_OF_STATES]; // UNUSED_ID index is used for isolated count
+    __shared__ size_t stats_arr[(THREADS / 2) * (THREADS / 2) * NUMBER_OF_STATES];
     for (size_t i = thread_id * NUMBER_OF_STATES; i < (thread_id + 1) * NUMBER_OF_STATES; ++i)
         stats_arr[i] = 0;
-//    if (thread_id == THREADS - 1) {
-//        for (size_t i = 0; i < NUMBER_OF_STATES * THREADS; ++i)
-//            stats_arr[i] = 0;
-//    }
 
     uint8_t cell_st_id;
-//    for (size_t row = 1u; row < field_side_len - 1u; ++row)
-    size_t row, col;
-    for (row = 1u + working_set_side * threadIdx.y; row < working_set_side * (threadIdx.y + 1); ++row)
-//        for (size_t col = 1u; col < field_side_len - 1u; ++col) {
-        for (col = 1u + working_set_side * threadIdx.x; col < 1u + working_set_side * (threadIdx.x + 1); ++col) {
-            cell_st_id = d_field[coord(row, col, field_side_len)];
+    size_t cell_coord;
+    for (size_t row = 1u + working_set_side * threadIdx.y; row < 1u + working_set_side * (threadIdx.y + 1); ++row)
+        for (size_t col = 1u + working_set_side * threadIdx.x; col < 1u + working_set_side * (threadIdx.x + 1); ++col) {
+            cell_coord = coord(row, col, field_side_len);
+            cell_st_id = d_field[cell_coord];
 
 //            if (cell_st_id & FINAL_STATE_CHECK_MASK) {
-//                d_next_field[coord(row, col, field_side_len)] = cell_st_id;
+//                d_next_field[cell_coord] = cell_st_id;
 //                continue;
 //            } else
             if (cell_st_id == HEALTHY_ID) {
@@ -236,37 +210,38 @@ __global__ void sim_block_worker(uint8_t *d_field, uint8_t *d_next_field, size_t
                 infect_cell(d_field[coord(row + 1u, col, field_side_len)], cell_st_id, probab_arr,
                             &(d_rand_gen_arr[thread_id]));
 
-                d_next_field[coord(row, col, field_side_len)] = cell_st_id;
+                d_next_field[cell_coord] = cell_st_id;
                 continue;
             }
 
-            ///////////////////////////  ISOLATE IF POSSIBLE  ///////////////////////////
+            ///////////////////////////  ISOLATE IF POSSIBLE  /////////////////////////
+            // TODO : isol to arr usage
 //            if (!(cell_st_id & ISOLATE_MASK))
 //                if (cell_st_id == PATIENT_ID)
-//                    if (*isolation_places) {
-//                        --(*isolation_places);
+//                    if (d_isolation_places_arr[thread_id]) {
+//                        --d_isolation_places_arr[thread_id];
 //                        cell_st_id = ISOLATE_MASK | PATIENT_ID;
 //                    }
             ///////////////////////////  ISOLATE IF POSSIBLE END  ///////////////////////
 
             ///////////////////////////  NEXT STATE  ///////////////////////
-//            if (random_bool(probab_arr[cell_st_id & REMOVE_ISOL_MASK], &(d_rand_gen_arr[thread_id]))) {
-//                ++cell_st_id;
-//                if ((cell_st_id & FINAL_STATE_CHECK_MASK) && (cell_st_id & ISOLATE_MASK)) {
-//                    ++(*isolation_places); // return an isolation place
-//                    cell_st_id &= REMOVE_ISOL_MASK;
-//                }
-//            } else if ((cell_st_id & REMOVE_ISOL_MASK) == PATIENT_CRIT_ID) {
-//                if (cell_st_id & ISOLATE_MASK)
-//                    ++(*isolation_places); // return an isolation place
-//                cell_st_id = IMMUNITY_ID;
-//            }
+            if (random_bool(probab_arr[cell_st_id & REMOVE_ISOL_MASK], &(d_rand_gen_arr[thread_id]))) {
+                ++cell_st_id;
+                if ((cell_st_id & FINAL_STATE_CHECK_MASK) && (cell_st_id & ISOLATE_MASK)) {
+                    ++d_isolation_places_arr[thread_id];
+                    cell_st_id &= REMOVE_ISOL_MASK;
+                }
+            } else if ((cell_st_id & REMOVE_ISOL_MASK) == PATIENT_CRIT_ID) {
+                if (cell_st_id & ISOLATE_MASK)
+                    ++d_isolation_places_arr[thread_id];
+                cell_st_id = IMMUNITY_ID;
+            }
             ///////////////////////////  NEXT STATE END  ///////////////////
-//            d_next_field[coord(row, col, field_side_len)] = cell_st_id;
+            d_next_field[cell_coord] = cell_st_id;
 
             /////////////////////////// STATISTICS GATHERING ///////////////////////
-//          if (   is_isolated           )
             if (cell_st_id & ISOLATE_MASK)
+                // UNUSED_ID index is used for isolated count
                 ++stats_arr[UNUSED_ID + thread_id * NUMBER_OF_STATES];
             else
                 ++stats_arr[cell_st_id + thread_id * NUMBER_OF_STATES];
